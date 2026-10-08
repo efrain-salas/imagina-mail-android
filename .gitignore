@@ -55,4 +55,6 @@ merged-prs-*.csv
 
 # Weblate cache
 cli/weblate-cli/weblate-components-cache.json
-imagina.properties
+
+# Imagina Mail: local parameters (test credentials)
+imagina/imagina.local.properties

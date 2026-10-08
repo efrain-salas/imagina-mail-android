@@ -23,7 +23,7 @@ import org.json.JSONObject
  * use, and creates one account per mailbox with the credential Imagina made for this device.
  *
  * Prototype (docs/PLAN_CLOUD.md, C0.9): Imagina's devices API (C7.1) does not exist yet, so the
- * person comes from /oauth/userinfo and the mailbox from the build (imagina.properties).
+ * person comes from /oauth/userinfo and the mailbox from imagina/imagina.local.properties.
  */
 class ImaginaAccountProvisioner(
     private val accountCreator: AccountCreator,
@@ -64,7 +64,7 @@ class ImaginaAccountProvisioner(
             emailAddress = mailbox.address,
             incomingServerSettings = ServerSettings(
                 type = "imap",
-                host = "imap.migadu.com",
+                host = BuildConfig.IMAGINA_IMAP_HOST,
                 port = 993,
                 connectionSecurity = ConnectionSecurity.SSL_TLS_REQUIRED,
                 authenticationType = AuthType.PLAIN,
@@ -80,7 +80,7 @@ class ImaginaAccountProvisioner(
             ),
             outgoingServerSettings = ServerSettings(
                 type = "smtp",
-                host = "smtp.migadu.com",
+                host = BuildConfig.IMAGINA_SMTP_HOST,
                 port = 465,
                 connectionSecurity = ConnectionSecurity.SSL_TLS_REQUIRED,
                 authenticationType = AuthType.PLAIN,

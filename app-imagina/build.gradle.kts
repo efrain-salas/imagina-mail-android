@@ -9,28 +9,30 @@ val testCoverageEnabled = providers
     .gradleProperty("testCoverageEnabled")
     .isPresent
 
+val imaginaParameters: Map<String, String> = Properties().apply {
+    listOf("imagina/imagina.properties", "imagina/imagina.local.properties")
+        .map { isolated.rootProject.projectDirectory.file(it).asFile }
+        .filter { it.exists() }
+        .forEach { file -> file.inputStream().use { load(it) } }
+}.entries.associate { (key, value) -> key.toString() to value.toString() }
+
 android {
     namespace = "net.thunderbird.android"
 
     defaultConfig {
-        applicationId = "build.imagina.mail"
-        testApplicationId = "build.imagina.mail.tests"
+        applicationId = imaginaParameters.getValue("IMAGINA_APPLICATION_ID")
+        testApplicationId = imaginaParameters.getValue("IMAGINA_APPLICATION_ID") + ".tests"
 
         versionCode = 33
         versionName = "0.1"
 
         buildConfigField("String", "CLIENT_INFO_APP_NAME", "\"Imagina Mail\"")
 
-        // Prototipo C0.9: cliente OAuth público de Imagina y, hasta que exista la API de dispositivos (C7.1),
-        // el buzón de prueba que recibe la app, leídos de imagina.properties (fuera de git).
-        val imagina = Properties().apply {
-            isolated.rootProject.projectDirectory.file("imagina.properties").asFile.takeIf { it.exists() }?.inputStream()?.use { load(it) }
+        // Imagina Mail parameters (IMAGINA.md): imagina/imagina.properties, committed, plus
+        // imagina/imagina.local.properties, local only (the test mailbox until Imagina's devices API exists)
+        imaginaParameters.forEach { (name, value) ->
+            buildConfigField("String", name, "\"$value\"")
         }
-        fun imaginaField(name: String) = buildConfigField("String", name, "\"${imagina.getProperty(name, "")}\"")
-        imaginaField("IMAGINA_OAUTH_CLIENT_ID")
-        imaginaField("IMAGINA_TEST_MAIL_ADDRESS")
-        imaginaField("IMAGINA_TEST_MAIL_USERNAME")
-        imaginaField("IMAGINA_TEST_MAIL_PASSWORD")
     }
 
     androidResources {

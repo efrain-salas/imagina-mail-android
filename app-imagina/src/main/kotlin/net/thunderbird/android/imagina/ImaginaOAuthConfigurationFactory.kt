@@ -24,5 +24,5 @@ class ImaginaOAuthConfigurationFactory : OAuthConfigurationFactory {
 }
 
 object ImaginaAuth {
-    const val HOST = "auth.imagina.build"
+    val HOST: String = BuildConfig.IMAGINA_AUTH_HOST
 }
