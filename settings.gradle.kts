@@ -72,6 +72,7 @@ if (useLocalComponents || useLocalBolt) {
 include(
     ":app-k9mail",
     ":app-thunderbird",
+    ":app-imagina",
 )
 
 include(

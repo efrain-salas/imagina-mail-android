@@ -52,7 +52,7 @@ abstract class BaseApplication : Application(), WorkManagerConfiguration.Provide
         Core.earlyInit()
 
         // Start Koin early so it is ready by the time content providers are initialized.
-        DI.start(this, listOf(provideAppModule()))
+        DI.start(this, listOf(provideAppModule()), allowOverride = allowsDefinitionOverride)
         Log.logger = logger
 
         super.attachBaseContext(base)
@@ -78,6 +78,12 @@ abstract class BaseApplication : Application(), WorkManagerConfiguration.Provide
     }
 
     abstract fun provideAppModule(): Module
+
+    /**
+     * Lets a white-label app replace definitions of the shared modules with its own (Imagina Mail replaces the
+     * Thundermail navigation with its own sign-in).
+     */
+    protected open val allowsDefinitionOverride: Boolean = false
 
     private fun initializeAppLanguage() {
         appLanguageManager.init()
