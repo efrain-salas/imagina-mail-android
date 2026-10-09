@@ -15,7 +15,4 @@
     <string name="imagina_error_network">No se ha podido conectar con Imagina. Comprueba tu conexión y vuelve a intentarlo.</string>
     <string name="imagina_error_no_mailboxes">Imagina no ha devuelto ningún buzón para ti.</string>
     <string name="imagina_error_unknown">No se han podido configurar tus buzones. Vuelve a intentarlo.</string>
-    <string name="imagina_instant_mail_title">Recibe el correo al momento</string>
-    <string name="imagina_instant_mail_description">Para traerte cada correo en cuanto llega, Imagina Mail necesita permiso para usar alarmas. Sin él, lo mira cada 15 minutos.</string>
-    <string name="imagina_instant_mail_allow">Permitir las alarmas</string>
 </resources>

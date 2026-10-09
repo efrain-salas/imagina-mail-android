@@ -67,14 +67,14 @@ Código de `imagina/`:
 | `ImaginaSession.kt` | Token de acceso válido en cada llamada: renueva con AppAuth (refresh token rotativo) guardando el nuevo antes de usarlo. |
 | `ImaginaDeviceStore.kt` | Lo que recuerda la app (SharedPreferences propio `imagina_device`, privado y sin copia de seguridad): id del dispositivo, estado OAuth, qué cuentas hizo y si hay que volver a entrar. |
 | `ImaginaDeviceSynchronizer.kt` | La lógica: registrar el dispositivo (solo si no hay o está revocado), una cuenta por buzón, ponerlas al día, quitar las de buzones retirados, desconectar. |
-| `ImaginaAccountProvisioner.kt` | Crea, actualiza y borra cuentas con las piezas de Thunderbird (`AccountCreator`, `AccountServerSettingsUpdater`, `BackgroundAccountRemover`) y marca la bandeja de entrada para push. |
+| `ImaginaAccountProvisioner.kt` | Crea, actualiza y borra cuentas con las piezas de Thunderbird (`AccountCreator`, `AccountServerSettingsUpdater`, `BackgroundAccountRemover`), con comprobación cada 15 minutos y sin carpetas push. |
 | `ImaginaSyncScheduler.kt` | WorkManager: cada 6 horas, al arrancar la app y tras entrar (`ImaginaSyncWorker`). |
 | `ImaginaStartup.kt` | Lo que arranca con la app: sincronización, oferta de volver a entrar y desconexión al borrar la última cuenta. |
 | `ImaginaErrors.kt` | Errores tipados (API, red, sesión, dispositivo revocado…). |
 
 **Cómo engancha con Thunderbird**: el lanzador (`feature/launcher`) saca todas sus pantallas de objetos de navegación de la inyección de dependencias. `BaseApplication.allowsDefinitionOverride` deja a Imagina sustituir cuatro:
 
-- `OnboardingNavigation` → `ImaginaOnboardingNavigation`: la primera pantalla es «Entrar con Imagina», sin la bienvenida con los logos y textos de Thunderbird y Mozilla; después, el paso de permisos (notificaciones), «Recibe el correo al momento» (`ImaginaInstantMailScreen`) y la bandeja. Ese paso pide «Alarmas y recordatorios»: Thunderbird mantiene viva la conexión IMAP IDLE con alarmas exactas y, desde Android 14, sin ese permiso apaga el push y solo mira el correo cada 15 minutos. Se salta solo si el permiso ya está y avanza en cuanto la persona vuelve de Ajustes con él.
+- `OnboardingNavigation` → `ImaginaOnboardingNavigation`: la primera pantalla es «Entrar con Imagina», sin la bienvenida con los logos y textos de Thunderbird y Mozilla; después, el paso de permisos (notificaciones) y la bandeja.
 - `AccountEditNavigation` → `ImaginaAccountEditNavigation`: **gancho de «nunca pedir contraseña»**. Todo lo que lleva a editar los servidores de una cuenta (el aviso «fallo de autenticación» de las notificaciones, los ajustes de la cuenta y la lista de mensajes) abre `FeatureLauncherTarget.AccountEdit*Settings`, que ya no muestra campos de servidor y contraseña sino «Entrar con Imagina» en modo `Reconnect`.
 - `AccountSetupNavigation` → `ImaginaAccountSetupNavigation`: «Añadir cuenta» abre también «Entrar con Imagina» (trae los buzones que falten) en lugar del asistente manual.
 - `ThundermailNavigation` → `ImaginaNavigation`: cualquier ruta de Thundermail acaba en lo mismo.
@@ -85,7 +85,7 @@ Código de `imagina/`:
 
 **Desconectar**: si la persona borra la última cuenta de Imagina (se oye con `Preferences.addAccountRemovedListener`), `DELETE /devices/{id}` (lo mejor posible) y se olvida todo.
 
-**Avisos al momento (IMAP IDLE)**: en esta versión de Thunderbird el push es por carpeta (`pushEnabled`; `folderPushMode` de la cuenta ya solo se usa al migrar ajustes viejos). Las carpetas nuevas leen sus ajustes iniciales de las preferencias (`<uuid de la cuenta>.<id de carpeta>.pushEnabled`, lo mismo que hace «Importar ajustes»), así que antes de crear la cuenta se escribe `<uuid>.INBOX.pushEnabled=true` y la bandeja de entrada nace como carpeta push. Migadu admite IDLE; sin servidor de notificaciones.
+**Correo nuevo, sin push en el móvil**: el push de Thunderbird (IMAP IDLE desde el móvil) necesita, desde Android 14, que la persona permita «Alarmas y recordatorios» a mano, y una notificación fija mientras escucha. Decisión del 9 oct 2026: no pedirlo. Las cuentas de Imagina no marcan ninguna carpeta como push y miran el correo cada 15 minutos, hasta que llegue el aviso desde Imagina (C12 del plan del Cloud: Imagina vigila cada buzón y despierta la app por Firebase).
 
 **`User-Agent`**: `message_header_mua` en `app-imagina/src/main/res/values/constants.xml` («Imagina Mail»), que gana al de `legacy/ui/legacy` («Thunderbird for Android») igual que hace `app-k9mail`.
 
@@ -115,7 +115,7 @@ Genera `ic_app_logo` y `ic_app_logo_monochrome` (icono de la app) e `ic_imagina_
 
 ## Pendiente para la app de verdad
 
-- Probado en el emulador contra producción el 9 oct 2026 (con el push por IDLE en marcha una vez permitidas las alarmas): «Entrar con Imagina» con la sesión que ya tenía el navegador (sin volver a pedir el código), la cuenta del buzón personal con su identidad propia y sus carpetas por IMAP. Falta probar varios buzones de varias empresas, recibir al momento con la app cerrada, revocar el móvil desde Imagina y la sincronización de cada 6 horas.
+- Probado en el emulador contra producción el 9 oct 2026: «Entrar con Imagina» con la sesión que ya tenía el navegador (sin volver a pedir el código), la cuenta del buzón personal con su identidad propia y sus carpetas por IMAP. Falta probar varios buzones de varias empresas, revocar el móvil desde Imagina y la sincronización de cada 6 horas. El correo al momento llegará con C12.
 - Colores de Imagina: los botones y la barra siguen con la paleta de Thunderbird (su tema de Compose `ThunderbirdBoltTheme` y los temas XML de las pantallas antiguas); hace falta un tema propio con el acento de Imagina.
 - Una cuenta de Imagina que la persona borra a mano (habiendo otras) no se recupera con «Entrar con Imagina»: la API solo reenvía credenciales de buzones `added`. Hay que desconectar el móvil en Imagina y entrar de nuevo, o que la API ofrezca reenviar credenciales.
 - Si una credencial deja de valer pero Imagina dice que nada ha cambiado (`changed: false`), «Entrar con Imagina» no la arregla: no se crea otro dispositivo con uno vigente. Decidir si `POST /refresh` debe rotar y reenviar la credencial en ese caso.

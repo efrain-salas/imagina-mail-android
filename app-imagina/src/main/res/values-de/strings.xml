@@ -15,7 +15,4 @@
     <string name="imagina_error_network">Imagina ist nicht erreichbar. Prüfe deine Internetverbindung und versuche es noch einmal.</string>
     <string name="imagina_error_no_mailboxes">Imagina hat kein Postfach für dich zurückgegeben.</string>
     <string name="imagina_error_unknown">Deine Postfächer konnten nicht eingerichtet werden. Versuche es bitte noch einmal.</string>
-    <string name="imagina_instant_mail_title">Neue E-Mails sofort erhalten</string>
-    <string name="imagina_instant_mail_description">Damit jede neue E-Mail sofort ankommt, braucht Imagina Mail die Erlaubnis, Wecker zu stellen. Ohne sie wird alle 15 Minuten nachgesehen.</string>
-    <string name="imagina_instant_mail_allow">Wecker erlauben</string>
 </resources>

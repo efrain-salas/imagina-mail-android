@@ -45,7 +45,6 @@ class ImaginaAccountProvisioner(
 
     override suspend fun create(mailbox: ImaginaMailAccount, accountName: String): String {
         val accountUuid = UUID.randomUUID().toString()
-        enablePushForInbox(accountUuid)
 
         val account = try {
             Account(
@@ -101,20 +100,7 @@ class ImaginaAccountProvisioner(
         }
     }
 
-    /**
-     * New mail at once (IMAP IDLE): Thunderbird pushes the folders marked as push folders, and a new
-     * account has none. Folder settings of an account that is being set up are read from the
-     * preferences when its folders are created (that is how importing settings works), so the inbox
-     * is created as a push folder.
-     */
-    private fun enablePushForInbox(accountUuid: String) {
-        preferences.createStorageEditor()
-            .putBoolean("$accountUuid.$INBOX_SERVER_ID.pushEnabled", true)
-            .commit()
-    }
-
     private companion object {
-        const val INBOX_SERVER_ID = "INBOX"
         const val CHECK_FREQUENCY_MINUTES = 15
         const val MESSAGE_DISPLAY_COUNT = 25
     }
