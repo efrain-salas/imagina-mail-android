@@ -15,4 +15,7 @@
     <string name="imagina_error_network">Impossibile raggiungere Imagina. Controlla la connessione e riprova.</string>
     <string name="imagina_error_no_mailboxes">Imagina non ha restituito nessuna casella per te.</string>
     <string name="imagina_error_unknown">Non è stato possibile configurare le tue caselle. Riprova.</string>
+    <string name="imagina_instant_mail_title">Ricevi la posta subito</string>
+    <string name="imagina_instant_mail_description">Per portarti ogni email appena arriva, Imagina Mail ha bisogno del permesso di usare le sveglie. Senza, controlla ogni 15 minuti.</string>
+    <string name="imagina_instant_mail_allow">Consenti le sveglie</string>
 </resources>

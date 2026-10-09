@@ -73,7 +73,7 @@ Código de `imagina/`:
 
 **Cómo engancha con Thunderbird**: el lanzador (`feature/launcher`) saca todas sus pantallas de objetos de navegación de la inyección de dependencias. `BaseApplication.allowsDefinitionOverride` deja a Imagina sustituir cuatro:
 
-- `OnboardingNavigation` → `ImaginaOnboardingNavigation`: la primera pantalla es «Entrar con Imagina», sin la bienvenida con los logos y textos de Thunderbird y Mozilla; después, el paso de permisos (notificaciones) y la bandeja.
+- `OnboardingNavigation` → `ImaginaOnboardingNavigation`: la primera pantalla es «Entrar con Imagina», sin la bienvenida con los logos y textos de Thunderbird y Mozilla; después, el paso de permisos (notificaciones), «Recibe el correo al momento» (`ImaginaInstantMailScreen`) y la bandeja. Ese paso pide «Alarmas y recordatorios»: Thunderbird mantiene viva la conexión IMAP IDLE con alarmas exactas y, desde Android 14, sin ese permiso apaga el push y solo mira el correo cada 15 minutos. Se salta solo si el permiso ya está y avanza en cuanto la persona vuelve de Ajustes con él.
 - `AccountEditNavigation` → `ImaginaAccountEditNavigation`: **gancho de «nunca pedir contraseña»**. Todo lo que lleva a editar los servidores de una cuenta (el aviso «fallo de autenticación» de las notificaciones, los ajustes de la cuenta y la lista de mensajes) abre `FeatureLauncherTarget.AccountEdit*Settings`, que ya no muestra campos de servidor y contraseña sino «Entrar con Imagina» en modo `Reconnect`.
 - `AccountSetupNavigation` → `ImaginaAccountSetupNavigation`: «Añadir cuenta» abre también «Entrar con Imagina» (trae los buzones que falten) en lugar del asistente manual.
 - `ThundermailNavigation` → `ImaginaNavigation`: cualquier ruta de Thundermail acaba en lo mismo.
@@ -114,7 +114,7 @@ Genera `ic_app_logo` y `ic_app_logo_monochrome` (icono de la app) e `ic_imagina_
 
 ## Pendiente para la app de verdad
 
-- Probado en el emulador contra producción el 9 oct 2026: «Entrar con Imagina» con la sesión que ya tenía el navegador (sin volver a pedir el código), la cuenta del buzón personal con su identidad propia y sus carpetas por IMAP. Falta probar varios buzones de varias empresas, recibir al momento con la app cerrada, revocar el móvil desde Imagina y la sincronización de cada 6 horas.
+- Probado en el emulador contra producción el 9 oct 2026 (con el push por IDLE en marcha una vez permitidas las alarmas): «Entrar con Imagina» con la sesión que ya tenía el navegador (sin volver a pedir el código), la cuenta del buzón personal con su identidad propia y sus carpetas por IMAP. Falta probar varios buzones de varias empresas, recibir al momento con la app cerrada, revocar el móvil desde Imagina y la sincronización de cada 6 horas.
 - Colores de Imagina: los botones y la barra siguen con la paleta de Thunderbird (su tema de Compose `ThunderbirdBoltTheme` y los temas XML de las pantallas antiguas); hace falta un tema propio con el acento de Imagina.
 - Una cuenta de Imagina que la persona borra a mano (habiendo otras) no se recupera con «Entrar con Imagina»: la API solo reenvía credenciales de buzones `added`. Hay que desconectar el móvil en Imagina y entrar de nuevo, o que la API ofrezca reenviar credenciales.
 - Si una credencial deja de valer pero Imagina dice que nada ha cambiado (`changed: false`), «Entrar con Imagina» no la arregla: no se crea otro dispositivo con uno vigente. Decidir si `POST /refresh` debe rotar y reenviar la credencial en ese caso.

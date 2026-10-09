@@ -27,7 +27,7 @@ import net.thunderbird.feature.thundermail.navigation.ThundermailRoute.Companion
 
 /**
  * The first screen of the app (Thunderbird has a welcome with its and Mozilla's logos and texts):
- * «Entrar con Imagina», then the permissions step, then the inbox.
+ * «Entrar con Imagina», then the permissions step, the alarms that keep new mail arriving at once, then the inbox.
  */
 class ImaginaOnboardingNavigation : OnboardingNavigation {
     override fun registerRoutes(
@@ -46,12 +46,25 @@ class ImaginaOnboardingNavigation : OnboardingNavigation {
 @Composable
 private fun ImaginaOnboarding(onFinish: (accountUuid: String) -> Unit) {
     var accountUuid by rememberSaveable { mutableStateOf<String?>(null) }
+    var permissionsDone by rememberSaveable { mutableStateOf(false) }
+    var finished by rememberSaveable { mutableStateOf(false) }
 
     val signedInAccountUuid = accountUuid
-    if (signedInAccountUuid == null) {
-        ImaginaSignInScreen(mode = ImaginaSignInMode.Onboarding, onSignedIn = { accountUuid = it })
-    } else {
-        PermissionsScreen(onNext = { onFinish(signedInAccountUuid) })
+    when {
+        signedInAccountUuid == null -> {
+            ImaginaSignInScreen(mode = ImaginaSignInMode.Onboarding, onSignedIn = { accountUuid = it })
+        }
+
+        !permissionsDone -> PermissionsScreen(onNext = { permissionsDone = true })
+
+        else -> ImaginaInstantMailScreen(
+            onNext = {
+                if (!finished) {
+                    finished = true
+                    onFinish(signedInAccountUuid)
+                }
+            },
+        )
     }
 }
 

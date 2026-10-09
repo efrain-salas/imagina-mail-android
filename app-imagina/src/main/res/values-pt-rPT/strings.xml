@@ -15,4 +15,7 @@
     <string name="imagina_error_network">Não foi possível contactar a Imagina. Verifica a tua ligação e tenta novamente.</string>
     <string name="imagina_error_no_mailboxes">A Imagina não devolveu nenhuma caixa de correio para ti.</string>
     <string name="imagina_error_unknown">Não foi possível configurar as tuas caixas de correio. Tenta novamente.</string>
+    <string name="imagina_instant_mail_title">Recebe o correio no momento</string>
+    <string name="imagina_instant_mail_description">Para te trazer cada email assim que chega, o Imagina Mail precisa de autorização para usar alarmes. Sem ela, verifica a cada 15 minutos.</string>
+    <string name="imagina_instant_mail_allow">Permitir os alarmes</string>
 </resources>

@@ -15,4 +15,7 @@
     <string name="imagina_error_network">Impossible de joindre Imagina. Vérifiez votre connexion et réessayez.</string>
     <string name="imagina_error_no_mailboxes">Imagina n’a renvoyé aucune boîte mail pour vous.</string>
     <string name="imagina_error_unknown">Impossible de configurer vos boîtes mail. Veuillez réessayer.</string>
+    <string name="imagina_instant_mail_title">Recevez vos e-mails tout de suite</string>
+    <string name="imagina_instant_mail_description">Pour vous apporter chaque e-mail dès son arrivée, Imagina Mail doit être autorisée à programmer des alarmes. Sans cela, elle vérifie toutes les 15 minutes.</string>
+    <string name="imagina_instant_mail_allow">Autoriser les alarmes</string>
 </resources>

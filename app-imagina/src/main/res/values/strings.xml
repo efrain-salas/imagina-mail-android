@@ -18,4 +18,7 @@
     <string name="imagina_error_network">Imagina could not be reached. Check your connection and try again.</string>
     <string name="imagina_error_no_mailboxes">Imagina did not return any mailbox for you.</string>
     <string name="imagina_error_unknown">Your mailboxes could not be set up. Please try again.</string>
+    <string name="imagina_instant_mail_title">Get new mail at once</string>
+    <string name="imagina_instant_mail_description">To bring each new email the moment it arrives, Imagina Mail needs to be allowed to set alarms. Without it, it checks every 15 minutes.</string>
+    <string name="imagina_instant_mail_allow">Allow alarms</string>
 </resources>
