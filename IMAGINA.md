@@ -100,10 +100,14 @@ imagina/generate-resources.sh
 
 Genera `ic_app_logo` y `ic_app_logo_monochrome` (icono de la app) e `ic_imagina_mark` (pantalla de acceso) con `imagina/tools/svg_to_vector.py`. También sustituye el logo de Thunderbird de su tema de Compose (`bolt_thunderbird_logo`, en la cabecera del paso de permisos y otras pantallas): es un recurso de Compose de `components/ui/bolt` que viaja como asset, y el asset de la app en `app-imagina/src/main/assets/composeResources/net.thunderbird.components.ui.bolt.resources/drawable/` con el mismo nombre lo reemplaza. Al actualizar Thunderbird, comprobar que ese recurso sigue llamándose igual (`unzip -l` de la APK).
 
+## Compilación automática
+
+`.github/workflows/imagina.yml` (GitHub Actions del repositorio público `efrain-salas/imagina-mail-android`): compila la APK de depuración y pasa las pruebas de `app-imagina` en cada subida a `main` (la APK queda como artefacto 14 días), y cada lunes abre una incidencia si Thunderbird ha publicado una versión posterior a `THUNDERBIRD_ANDROID_TAG` (en `imagina/imagina.properties`). Los flujos de Thunderbird que trae el fork están desactivados en GitHub (`gh workflow disable`), porque son para su repositorio. La firma de publicación llegará con la cuenta de Google Play.
+
 ## Actualizar a una nueva versión de Thunderbird
 
 1. `git fetch upstream --tags` y `git merge THUNDERBIRD_<nueva>` sobre `main`.
-2. Los conflictos solo pueden venir de los tres ficheros de la tabla de arriba.
+2. Cambiar `THUNDERBIRD_ANDROID_TAG` en `imagina/imagina.properties`. Los conflictos solo pueden venir de los tres ficheros de la tabla de arriba.
 3. Comparar `app-thunderbird` entre la versión anterior y la nueva (`git diff THUNDERBIRD_<anterior> THUNDERBIRD_<nueva> -- app-thunderbird`) y llevar a `app-imagina` lo que cambie (dependencias, módulos de Koin, manifest), salvo nombre, id e icono.
 4. Comprobar que siguen existiendo los puntos de enganche: `OnboardingNavigation`/`OnboardingRoute.Onboarding`, `AccountEditNavigation`, `AccountSetupNavigation`, `ThundermailNavigation`, `AccountSetupExternalContract.AccountCreator`, `AccountEditExternalContract.AccountServerSettingsUpdater`, `BackgroundAccountRemover`, `Preferences.addAccountRemovedListener`, la clave `<uuid>.<carpeta>.pushEnabled` de `com.fsck.k9.mailstore.FolderSettingsProvider`, el recurso `message_header_mua` y que `K9WorkerFactory` siga dejando pasar a las clases que no son de `com.fsck.k9`.
 5. Compilar, pasar `./gradlew :app-imagina:testFossDebugUnitTest` y probar en el emulador o el móvil: «Entrar con Imagina», cuentas creadas, recibir y enviar, aviso al momento.
