@@ -1,3 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="imagina_sign_in_description">Accedi con il tuo numero di cellulare e il codice che ti arriverà via SMS. Le tue caselle si configurano da sole.</string>
+    <string name="imagina_sign_in_button">Accedi con Imagina</string>
+    <string name="imagina_sign_in_working">Configurazione delle tue caselle…</string>
+    <string name="imagina_reconnect_title">Accedi di nuovo con Imagina</string>
+    <string name="imagina_reconnect_description">Accedi di nuovo con Imagina per aggiornare le tue caselle su questo telefono.</string>
+    <string name="imagina_reconnect_dismiss">Non ora</string>
+    <string name="imagina_error_browser_not_available">Su questo telefono non è disponibile nessun browser.</string>
+    <string name="imagina_error_sign_in_failed">Non siamo riusciti ad accedere con Imagina. Riprova.</string>
+    <string name="imagina_error_no_seat">Il tuo account Imagina non ha ancora nessuna casella. Chiedila a chi gestisce il tuo Cloud.</string>
+    <string name="imagina_error_not_ready">Il tuo Cloud non è ancora pronto. Riprova tra qualche minuto.</string>
+    <string name="imagina_error_not_supported">Imagina non può collegare questo telefono.</string>
+    <string name="imagina_error_unavailable">Imagina non è disponibile in questo momento. Riprova tra qualche minuto.</string>
+    <string name="imagina_error_network">Impossibile raggiungere Imagina. Controlla la connessione e riprova.</string>
+    <string name="imagina_error_no_mailboxes">Imagina non ha restituito nessuna casella per te.</string>
+    <string name="imagina_error_unknown">Non è stato possibile configurare le tue caselle. Riprova.</string>
+</resources>

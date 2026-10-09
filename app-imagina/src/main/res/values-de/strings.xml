@@ -1,3 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="imagina_sign_in_description">Melde dich mit deiner Handynummer und dem Code an, den du per SMS bekommst. Deine Postfächer richten sich von selbst ein.</string>
+    <string name="imagina_sign_in_button">Mit Imagina anmelden</string>
+    <string name="imagina_sign_in_working">Deine Postfächer werden eingerichtet …</string>
+    <string name="imagina_reconnect_title">Melde dich erneut bei Imagina an</string>
+    <string name="imagina_reconnect_description">Melde dich erneut bei Imagina an, um deine Postfächer auf diesem Handy zu aktualisieren.</string>
+    <string name="imagina_reconnect_dismiss">Nicht jetzt</string>
+    <string name="imagina_error_browser_not_available">Auf diesem Handy ist kein Browser verfügbar.</string>
+    <string name="imagina_error_sign_in_failed">Die Anmeldung bei Imagina hat nicht geklappt. Versuche es bitte noch einmal.</string>
+    <string name="imagina_error_no_seat">Dein Imagina-Konto hat noch kein Postfach. Frage die Person, die deine Cloud verwaltet.</string>
+    <string name="imagina_error_not_ready">Deine Cloud ist noch nicht bereit. Versuche es in ein paar Minuten noch einmal.</string>
+    <string name="imagina_error_not_supported">Imagina kann dieses Handy nicht verbinden.</string>
+    <string name="imagina_error_unavailable">Imagina ist gerade nicht verfügbar. Versuche es in ein paar Minuten noch einmal.</string>
+    <string name="imagina_error_network">Imagina ist nicht erreichbar. Prüfe deine Internetverbindung und versuche es noch einmal.</string>
+    <string name="imagina_error_no_mailboxes">Imagina hat kein Postfach für dich zurückgegeben.</string>
+    <string name="imagina_error_unknown">Deine Postfächer konnten nicht eingerichtet werden. Versuche es bitte noch einmal.</string>
+</resources>

@@ -1,3 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="imagina_sign_in_description">Entra com o teu número de telemóvel e o código que recebes por SMS. As tuas caixas de correio configuram-se sozinhas.</string>
+    <string name="imagina_sign_in_button">Entrar com a Imagina</string>
+    <string name="imagina_sign_in_working">A configurar as tuas caixas de correio…</string>
+    <string name="imagina_reconnect_title">Volta a entrar com a Imagina</string>
+    <string name="imagina_reconnect_description">Entra de novo com a Imagina para atualizar as tuas caixas de correio neste telemóvel.</string>
+    <string name="imagina_reconnect_dismiss">Agora não</string>
+    <string name="imagina_error_browser_not_available">Não há nenhum navegador disponível neste telemóvel.</string>
+    <string name="imagina_error_sign_in_failed">Não foi possível entrar com a Imagina. Tenta novamente.</string>
+    <string name="imagina_error_no_seat">A tua conta Imagina ainda não tem nenhuma caixa de correio. Pede-a a quem gere a tua Cloud.</string>
+    <string name="imagina_error_not_ready">A tua Cloud ainda não está pronta. Tenta novamente dentro de alguns minutos.</string>
+    <string name="imagina_error_not_supported">A Imagina não consegue ligar este telemóvel.</string>
+    <string name="imagina_error_unavailable">A Imagina não está disponível neste momento. Tenta novamente dentro de alguns minutos.</string>
+    <string name="imagina_error_network">Não foi possível contactar a Imagina. Verifica a tua ligação e tenta novamente.</string>
+    <string name="imagina_error_no_mailboxes">A Imagina não devolveu nenhuma caixa de correio para ti.</string>
+    <string name="imagina_error_unknown">Não foi possível configurar as tuas caixas de correio. Tenta novamente.</string>
+</resources>

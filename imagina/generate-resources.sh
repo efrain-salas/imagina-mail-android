@@ -17,4 +17,11 @@ $TOOL $MARK "$OUT/ic_app_logo_monochrome.xml" --width 64 --height 64 --translate
 # The whole mark, tile included, for the «Entrar con Imagina» screen.
 $TOOL $MARK "$OUT/ic_imagina_mark.xml" --width 64 --height 64
 
+# Thunderbird's logo in its Compose theme (the header of the permissions step and other onboarding screens)
+# is a Compose resource of components/ui/bolt, packaged as an asset: an asset of the app at the same path
+# replaces it, so the bird never shows.
+BOLT=app-imagina/src/main/assets/composeResources/net.thunderbird.components.ui.bolt.resources/drawable
+mkdir -p "$BOLT"
+$TOOL $MARK "$BOLT/bolt_thunderbird_logo.xml" --width 72 --height 72
+
 echo "Generated in $OUT"

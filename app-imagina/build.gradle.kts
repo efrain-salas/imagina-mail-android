@@ -9,12 +9,17 @@ val testCoverageEnabled = providers
     .gradleProperty("testCoverageEnabled")
     .isPresent
 
-val imaginaParameters: Map<String, String> = Properties().apply {
-    listOf("imagina/imagina.properties", "imagina/imagina.local.properties")
-        .map { isolated.rootProject.projectDirectory.file(it).asFile }
-        .filter { it.exists() }
-        .forEach { file -> file.inputStream().use { load(it) } }
-}.entries.associate { (key, value) -> key.toString() to value.toString() }
+// imagina/imagina.properties declares every parameter; imagina/imagina.local.properties (ignored by git)
+// may only override those, so a leftover or misspelt key never ends up inside the APK
+val imaginaParameters: Map<String, String> = run {
+    fun read(path: String): Map<String, String> = Properties().apply {
+        val file = isolated.rootProject.projectDirectory.file(path).asFile
+        if (file.exists()) file.inputStream().use { load(it) }
+    }.entries.associate { (key, value) -> key.toString() to value.toString() }
+
+    val declared = read("imagina/imagina.properties")
+    declared + read("imagina/imagina.local.properties").filterKeys { it in declared }
+}
 
 android {
     namespace = "net.thunderbird.android"
@@ -28,8 +33,8 @@ android {
 
         buildConfigField("String", "CLIENT_INFO_APP_NAME", "\"Imagina Mail\"")
 
-        // Imagina Mail parameters (IMAGINA.md): imagina/imagina.properties, committed, plus
-        // imagina/imagina.local.properties, local only (the test mailbox until Imagina's devices API exists)
+        // Imagina Mail parameters (IMAGINA.md): imagina/imagina.properties, committed, which
+        // imagina/imagina.local.properties (local only) may override
         imaginaParameters.forEach { (name, value) ->
             buildConfigField("String", name, "\"$value\"")
         }
@@ -280,12 +285,15 @@ dependencies {
 
     // Entrar con Imagina
     implementation(libs.appauth)
+    implementation(libs.kotlinx.serialization.json)
     implementation(projects.core.ui.navigation)
     implementation(projects.feature.account.common)
+    implementation(projects.feature.account.edit)
     implementation(projects.feature.account.oauth)
+    implementation(projects.feature.account.settings.api)
     implementation(projects.feature.account.setup)
+    implementation(projects.feature.onboarding.main)
     implementation(projects.feature.onboarding.permissions)
-    implementation(projects.feature.settings.import)
     implementation(projects.mail.protocols.imap)
 
     // TODO remove once OAuth ids have been moved from TBD to TBA
@@ -299,8 +307,11 @@ dependencies {
     testImplementation(projects.feature.changelog.internal)
 
     testImplementation(libs.appauth)
-}
 
+    // Tests of the link with Imagina's devices API
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(projects.core.logging.testing)
+}
 
 tasks.register("printConfigurations") {
     doLast {

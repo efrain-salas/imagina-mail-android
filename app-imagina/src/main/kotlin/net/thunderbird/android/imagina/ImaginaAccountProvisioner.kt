@@ -2,111 +2,154 @@ package net.thunderbird.android.imagina
 
 import app.k9mail.feature.account.common.domain.entity.Account
 import app.k9mail.feature.account.common.domain.entity.AccountOptions
-import app.k9mail.feature.account.common.domain.entity.AuthorizationState
+import app.k9mail.feature.account.edit.AccountEditExternalContract.AccountServerSettingsUpdater
+import app.k9mail.feature.account.edit.AccountEditExternalContract.AccountUpdaterResult
 import app.k9mail.feature.account.setup.AccountSetupExternalContract.AccountCreator
 import app.k9mail.feature.account.setup.AccountSetupExternalContract.AccountCreator.AccountCreatorResult
+import com.fsck.k9.Preferences
 import com.fsck.k9.mail.AuthType
 import com.fsck.k9.mail.ConnectionSecurity
 import com.fsck.k9.mail.ServerSettings
 import com.fsck.k9.mail.store.imap.ImapStoreSettings
-import java.net.HttpURLConnection
-import java.net.URL
 import java.util.UUID
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import net.openid.appauth.AuthState
-import net.thunderbird.android.BuildConfig
-import org.json.JSONObject
+import net.thunderbird.feature.account.settings.api.BackgroundAccountRemover
 
 /**
- * Turns an Imagina sign-in into mail accounts: asks Imagina who signed in and which mailboxes they
- * use, and creates one account per mailbox with the credential Imagina made for this device.
- *
- * Prototype (docs/PLAN_CLOUD.md, C0.9): Imagina's devices API (C7.1) does not exist yet, so the
- * person comes from /oauth/userinfo and the mailbox from imagina/imagina.local.properties.
+ * The mail accounts of this phone, as far as Imagina's devices are concerned: one account per
+ * mailbox, made with the credential Imagina created for this device.
+ */
+interface ImaginaLocalAccounts {
+    /** Creates the account of [mailbox] and returns its uuid. */
+    suspend fun create(mailbox: ImaginaMailAccount, accountName: String): String
+
+    /** Puts the servers and credential Imagina gave in the account that already exists. */
+    suspend fun updateCredentials(accountUuid: String, mailbox: ImaginaMailAccount)
+
+    /** Removes the account and its messages in the background. */
+    fun remove(accountUuid: String)
+
+    fun exists(accountUuid: String): Boolean
+}
+
+/**
+ * Thunderbird's own pieces do the work: the [AccountCreator] that account setup uses, the
+ * [AccountServerSettingsUpdater] of the server settings screens and the [BackgroundAccountRemover]
+ * of «Eliminar cuenta».
  */
 class ImaginaAccountProvisioner(
     private val accountCreator: AccountCreator,
-) {
-    suspend fun provision(authorizationState: AuthorizationState): Result<String> = runCatching {
-        val json = requireNotNull(authorizationState.value) { "Imagina no ha devuelto la sesión" }
-        val accessToken = requireNotNull(AuthState.jsonDeserialize(json).accessToken) { "Imagina no ha devuelto el token" }
-        val person = userInfo(accessToken)
-        val mailboxes = mailboxesFor(person)
+    private val serverSettingsUpdater: AccountServerSettingsUpdater,
+    private val accountRemover: BackgroundAccountRemover,
+    private val preferences: Preferences,
+) : ImaginaLocalAccounts {
 
-        mailboxes.map { mailbox -> createAccount(mailbox, person) }.first()
-    }
+    override suspend fun create(mailbox: ImaginaMailAccount, accountName: String): String {
+        val accountUuid = UUID.randomUUID().toString()
+        enablePushForInbox(accountUuid)
 
-    private suspend fun userInfo(accessToken: String): Person = withContext(Dispatchers.IO) {
-        val connection = URL("https://${ImaginaAuth.HOST}/oauth/userinfo").openConnection() as HttpURLConnection
-        try {
-            connection.setRequestProperty("Authorization", "Bearer $accessToken")
-            connection.setRequestProperty("Accept", "application/json")
-            check(connection.responseCode == HttpURLConnection.HTTP_OK) { "Imagina respondió ${connection.responseCode}" }
-            val body = JSONObject(connection.inputStream.bufferedReader().use { it.readText() })
-            Person(name = body.optString("name"), email = body.optString("email"))
-        } finally {
-            connection.disconnect()
-        }
-    }
-
-    private fun mailboxesFor(person: Person): List<Mailbox> = listOf(
-        Mailbox(
-            address = BuildConfig.IMAGINA_TEST_MAIL_ADDRESS,
-            username = BuildConfig.IMAGINA_TEST_MAIL_USERNAME,
-            password = BuildConfig.IMAGINA_TEST_MAIL_PASSWORD,
-        ),
-    )
-
-    private suspend fun createAccount(mailbox: Mailbox, person: Person): String {
-        val account = Account(
-            uuid = UUID.randomUUID().toString(),
-            emailAddress = mailbox.address,
-            incomingServerSettings = ServerSettings(
-                type = "imap",
-                host = BuildConfig.IMAGINA_IMAP_HOST,
-                port = 993,
-                connectionSecurity = ConnectionSecurity.SSL_TLS_REQUIRED,
-                authenticationType = AuthType.PLAIN,
-                username = mailbox.username,
-                password = mailbox.password,
-                clientCertificateAlias = null,
-                extra = ImapStoreSettings.createExtra(
-                    autoDetectNamespace = true,
-                    pathPrefix = null,
-                    useCompression = true,
-                    sendClientInfo = true,
+        val account = try {
+            Account(
+                uuid = accountUuid,
+                emailAddress = mailbox.address,
+                incomingServerSettings = mailbox.incomingServerSettings(),
+                outgoingServerSettings = mailbox.outgoingServerSettings(),
+                authorizationState = null,
+                specialFolderSettings = null,
+                options = AccountOptions(
+                    accountName = accountName,
+                    displayName = mailbox.name.ifBlank { mailbox.address },
+                    emailSignature = null,
+                    checkFrequencyInMinutes = CHECK_FREQUENCY_MINUTES,
+                    messageDisplayCount = MESSAGE_DISPLAY_COUNT,
+                    showNotification = true,
                 ),
-            ),
-            outgoingServerSettings = ServerSettings(
-                type = "smtp",
-                host = BuildConfig.IMAGINA_SMTP_HOST,
-                port = 465,
-                connectionSecurity = ConnectionSecurity.SSL_TLS_REQUIRED,
-                authenticationType = AuthType.PLAIN,
-                username = mailbox.username,
-                password = mailbox.password,
-                clientCertificateAlias = null,
-            ),
-            authorizationState = null,
-            specialFolderSettings = null,
-            options = AccountOptions(
-                accountName = mailbox.address,
-                displayName = person.name.ifBlank { mailbox.address },
-                emailSignature = null,
-                checkFrequencyInMinutes = 15,
-                messageDisplayCount = 25,
-                showNotification = true,
-            ),
-        )
+            )
+        } catch (error: IllegalArgumentException) {
+            throw ImaginaAccountException("Imagina sent a mailbox that cannot be used", error)
+        }
 
         return when (val result = accountCreator.createAccount(account)) {
             is AccountCreatorResult.Success -> result.accountUuid
-            is AccountCreatorResult.Error -> error(result.message)
+            is AccountCreatorResult.Error -> throw ImaginaAccountException(result.message)
         }
     }
 
-    data class Person(val name: String, val email: String)
+    override suspend fun updateCredentials(accountUuid: String, mailbox: ImaginaMailAccount) {
+        try {
+            updateServerSettings(accountUuid, isIncoming = true, mailbox.incomingServerSettings())
+            updateServerSettings(accountUuid, isIncoming = false, mailbox.outgoingServerSettings())
+        } catch (error: IllegalArgumentException) {
+            throw ImaginaAccountException("Imagina sent a mailbox that cannot be used", error)
+        }
+    }
 
-    private data class Mailbox(val address: String, val username: String, val password: String)
+    override fun remove(accountUuid: String) {
+        accountRemover.removeAccountAsync(accountUuid)
+    }
+
+    override fun exists(accountUuid: String): Boolean = preferences.getAccount(accountUuid) != null
+
+    private suspend fun updateServerSettings(accountUuid: String, isIncoming: Boolean, settings: ServerSettings) {
+        val result = serverSettingsUpdater.updateServerSettings(
+            accountUuid = accountUuid,
+            isIncoming = isIncoming,
+            serverSettings = settings,
+            authorizationState = null,
+        )
+        if (result !is AccountUpdaterResult.Success) {
+            throw ImaginaAccountException("Could not update the account $accountUuid: $result")
+        }
+    }
+
+    /**
+     * New mail at once (IMAP IDLE): Thunderbird pushes the folders marked as push folders, and a new
+     * account has none. Folder settings of an account that is being set up are read from the
+     * preferences when its folders are created (that is how importing settings works), so the inbox
+     * is created as a push folder.
+     */
+    private fun enablePushForInbox(accountUuid: String) {
+        preferences.createStorageEditor()
+            .putBoolean("$accountUuid.$INBOX_SERVER_ID.pushEnabled", true)
+            .commit()
+    }
+
+    private companion object {
+        const val INBOX_SERVER_ID = "INBOX"
+        const val CHECK_FREQUENCY_MINUTES = 15
+        const val MESSAGE_DISPLAY_COUNT = 25
+    }
+}
+
+internal fun ImaginaMailAccount.incomingServerSettings() = ServerSettings(
+    type = "imap",
+    host = imap.host,
+    port = imap.port,
+    connectionSecurity = imap.connectionSecurity(),
+    authenticationType = AuthType.PLAIN,
+    username = username,
+    password = password,
+    clientCertificateAlias = null,
+    extra = ImapStoreSettings.createExtra(
+        autoDetectNamespace = true,
+        pathPrefix = null,
+        useCompression = true,
+        sendClientInfo = true,
+    ),
+)
+
+internal fun ImaginaMailAccount.outgoingServerSettings() = ServerSettings(
+    type = "smtp",
+    host = smtp.host,
+    port = smtp.port,
+    connectionSecurity = smtp.connectionSecurity(),
+    authenticationType = AuthType.PLAIN,
+    username = username,
+    password = password,
+    clientCertificateAlias = null,
+)
+
+internal fun ImaginaServer.connectionSecurity(): ConnectionSecurity = when (security.lowercase()) {
+    "ssl", "tls" -> ConnectionSecurity.SSL_TLS_REQUIRED
+    "starttls" -> ConnectionSecurity.STARTTLS_REQUIRED
+    else -> throw ImaginaAccountException("Unsupported connection security: $security")
 }

@@ -2,4 +2,20 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name" translatable="false">Imagina Mail</string>
     <string name="brand_name" translatable="false">Imagina</string>
+
+    <string name="imagina_sign_in_description">Sign in with your mobile number and the code we send you by SMS. Your mailboxes set themselves up.</string>
+    <string name="imagina_sign_in_button">Sign in with Imagina</string>
+    <string name="imagina_sign_in_working">Setting up your mailboxes…</string>
+    <string name="imagina_reconnect_title">Sign in with Imagina again</string>
+    <string name="imagina_reconnect_description">Sign in with Imagina again to bring your mailboxes up to date on this phone.</string>
+    <string name="imagina_reconnect_dismiss">Not now</string>
+    <string name="imagina_error_browser_not_available">There is no web browser available on this phone.</string>
+    <string name="imagina_error_sign_in_failed">We could not sign you in with Imagina. Please try again.</string>
+    <string name="imagina_error_no_seat">Your Imagina account does not have a mailbox yet. Ask the person who manages your Cloud.</string>
+    <string name="imagina_error_not_ready">Your Cloud is not ready yet. Please try again in a few minutes.</string>
+    <string name="imagina_error_not_supported">Imagina cannot connect this phone.</string>
+    <string name="imagina_error_unavailable">Imagina is not available right now. Please try again in a few minutes.</string>
+    <string name="imagina_error_network">Imagina could not be reached. Check your connection and try again.</string>
+    <string name="imagina_error_no_mailboxes">Imagina did not return any mailbox for you.</string>
+    <string name="imagina_error_unknown">Your mailboxes could not be set up. Please try again.</string>
 </resources>

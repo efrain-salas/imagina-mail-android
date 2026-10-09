@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Overrides the one of Thunderbird (legacy/ui/legacy): the User-Agent header of the mail the app sends -->
+    <string name="message_header_mua" translatable="false">Imagina Mail</string>
+</resources>

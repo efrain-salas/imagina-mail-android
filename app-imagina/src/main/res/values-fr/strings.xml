@@ -1,3 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="imagina_sign_in_description">Connectez-vous avec votre numéro de mobile et le code reçu par SMS. Vos boîtes mail se configurent toutes seules.</string>
+    <string name="imagina_sign_in_button">Se connecter avec Imagina</string>
+    <string name="imagina_sign_in_working">Configuration de vos boîtes mail…</string>
+    <string name="imagina_reconnect_title">Reconnectez-vous avec Imagina</string>
+    <string name="imagina_reconnect_description">Connectez-vous de nouveau avec Imagina pour mettre à jour vos boîtes mail sur ce téléphone.</string>
+    <string name="imagina_reconnect_dismiss">Pas maintenant</string>
+    <string name="imagina_error_browser_not_available">Aucun navigateur n’est disponible sur ce téléphone.</string>
+    <string name="imagina_error_sign_in_failed">Impossible de vous connecter avec Imagina. Veuillez réessayer.</string>
+    <string name="imagina_error_no_seat">Votre compte Imagina n’a pas encore de boîte mail. Demandez-en une à la personne qui gère votre Cloud.</string>
+    <string name="imagina_error_not_ready">Votre Cloud n’est pas encore prêt. Veuillez réessayer dans quelques minutes.</string>
+    <string name="imagina_error_not_supported">Imagina ne peut pas connecter ce téléphone.</string>
+    <string name="imagina_error_unavailable">Imagina n’est pas disponible pour le moment. Veuillez réessayer dans quelques minutes.</string>
+    <string name="imagina_error_network">Impossible de joindre Imagina. Vérifiez votre connexion et réessayez.</string>
+    <string name="imagina_error_no_mailboxes">Imagina n’a renvoyé aucune boîte mail pour vous.</string>
+    <string name="imagina_error_unknown">Impossible de configurer vos boîtes mail. Veuillez réessayer.</string>
+</resources>

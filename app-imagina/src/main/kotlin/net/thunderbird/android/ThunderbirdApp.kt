@@ -2,12 +2,14 @@ package net.thunderbird.android
 
 import app.k9mail.feature.telemetry.api.TelemetryManager
 import com.fsck.k9.K9
+import net.thunderbird.android.imagina.ImaginaStartup
 import net.thunderbird.app.common.FeatureFlagApplication
 import org.koin.android.ext.android.inject
 import org.koin.core.module.Module
 
 class ThunderbirdApp : FeatureFlagApplication() {
     private val telemetryManager: TelemetryManager by inject()
+    private val imaginaStartup: ImaginaStartup by inject()
 
     override fun provideAppModule(): Module = appModule
     override val appName: String = "imagina-mail"
@@ -18,6 +20,7 @@ class ThunderbirdApp : FeatureFlagApplication() {
         super.onCreate()
 
         initializeTelemetry()
+        imaginaStartup.start()
     }
 
     private fun initializeTelemetry() {

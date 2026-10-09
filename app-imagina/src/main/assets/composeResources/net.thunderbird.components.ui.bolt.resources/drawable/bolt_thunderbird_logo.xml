@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from imagina/brand/imagina-mail-mark.svg by imagina/tools/svg_to_vector.py: edit the SVG, not this file -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="72dp" android:height="72dp"
+    android:viewportWidth="64" android:viewportHeight="64">
+    <group android:translateX="0" android:translateY="0" android:scaleX="1" android:scaleY="1">
+        <path android:pathData="M16,0H48A16,16 0 0,1 64,16V48A16,16 0 0,1 48,64H16A16,16 0 0,1 0,48V16A16,16 0 0,1 16,0Z" android:fillColor="#1A1B25" />
+        <path android:pathData="M17,21H47A4,4 0 0 1 51,25V41A4,4 0 0 1 47,45H17A4,4 0 0 1 13,41V25A4,4 0 0 1 17,21Z" android:fillColor="#F8F7F4" />
+        <path android:pathData="M15.5,24L32,35.5L48.5,24" android:strokeColor="#1A1B25" android:strokeWidth="3" android:strokeLineCap="round" android:strokeLineJoin="round" />
+        <path android:pathData="M41.5,20.5a8,8 0 1,0 16,0a8,8 0 1,0 -16,0Z" android:fillColor="#1A1B25" />
+        <path android:pathData="M43.94,20.5a5.56,5.56 0 1,0 11.12,0a5.56,5.56 0 1,0 -11.12,0Z" android:fillColor="#0D9488" />
+    </group>
+</vector>

@@ -1,3 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    </resources>
+    <string name="imagina_sign_in_description">Entra con tu móvil y el código que te llegará por SMS. Tus buzones se configuran solos.</string>
+    <string name="imagina_sign_in_button">Entrar con Imagina</string>
+    <string name="imagina_sign_in_working">Configurando tus buzones…</string>
+    <string name="imagina_reconnect_title">Vuelve a entrar con Imagina</string>
+    <string name="imagina_reconnect_description">Entra de nuevo con Imagina para poner al día tus buzones en este móvil.</string>
+    <string name="imagina_reconnect_dismiss">Ahora no</string>
+    <string name="imagina_error_browser_not_available">No hay un navegador disponible en este móvil.</string>
+    <string name="imagina_error_sign_in_failed">No hemos podido entrar con Imagina. Vuelve a intentarlo.</string>
+    <string name="imagina_error_no_seat">Tu cuenta de Imagina todavía no tiene ningún buzón. Pídeselo a quien gestiona tu Cloud.</string>
+    <string name="imagina_error_not_ready">Tu Cloud aún no está listo. Vuelve a intentarlo en unos minutos.</string>
+    <string name="imagina_error_not_supported">Imagina no puede conectar este móvil.</string>
+    <string name="imagina_error_unavailable">Imagina no está disponible ahora mismo. Vuelve a intentarlo en unos minutos.</string>
+    <string name="imagina_error_network">No se ha podido conectar con Imagina. Comprueba tu conexión y vuelve a intentarlo.</string>
+    <string name="imagina_error_no_mailboxes">Imagina no ha devuelto ningún buzón para ti.</string>
+    <string name="imagina_error_unknown">No se han podido configurar tus buzones. Vuelve a intentarlo.</string>
+</resources>
