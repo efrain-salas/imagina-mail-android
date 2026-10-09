@@ -21,6 +21,9 @@ jobs:
     build:
         if: github.event_name != 'schedule'
         runs-on: ubuntu-latest
+        env:
+            # Imagina's Firebase project (out of git); without it the app builds without Imagina's push
+            GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         steps:
             -   uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             -   name: set up JDK 21
@@ -29,6 +32,9 @@ jobs:
                     distribution: "temurin"
                     java-version: 21
             -   uses: gradle/actions/wrapper-validation@9c971963bec38e04b3d30dcc455b5382be2fdbfb # v6.3.0
+            -   name: Imagina's Firebase project
+                if: env.GOOGLE_SERVICES_JSON != ''
+                run: printf '%s' "$GOOGLE_SERVICES_JSON" > app-imagina/google-services.json
             -   name: Build and test
                 run: ./gradlew :app-imagina:assembleFossDebug :app-imagina:testFossDebugUnitTest
             -   uses: actions/upload-artifact@v4
