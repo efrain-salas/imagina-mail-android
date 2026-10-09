@@ -37,10 +37,22 @@ interface ImaginaDeviceStore {
     /** The mail accounts made for Imagina's mailboxes. */
     var accounts: List<ImaginaManagedAccount>
 
+    /** The last Firebase token Imagina Mail knows of, or `null` when it has not seen one. */
+    var pushToken: String?
+
+    /** The device whose registration at Imagina holds [pushToken]: `null` when Imagina does not have it yet. */
+    var pushRegisteredDeviceId: String?
+
+    /** How often (in minutes) the accounts were last told to check mail by themselves: 0 when never. */
+    var checkFrequencyMinutes: Int
+
     val isConnected: Boolean
         get() = deviceId != null
 
-    /** Forgets the device, the sign-in and the accounts list (the accounts themselves are not touched). */
+    /**
+     * Forgets the device, the sign-in, the push registration and the accounts list (the accounts themselves
+     * are not touched).
+     */
     fun clear()
 }
 
@@ -75,6 +87,18 @@ class SharedPreferencesImaginaDeviceStore(context: Context) : ImaginaDeviceStore
         get() = decodeAccounts(preferences.getString(KEY_ACCOUNTS, null))
         set(value) = preferences.edit(commit = true) { putString(KEY_ACCOUNTS, encodeAccounts(value)) }
 
+    override var pushToken: String?
+        get() = preferences.getString(KEY_PUSH_TOKEN, null)
+        set(value) = preferences.edit(commit = true) { putString(KEY_PUSH_TOKEN, value) }
+
+    override var pushRegisteredDeviceId: String?
+        get() = preferences.getString(KEY_PUSH_REGISTERED_DEVICE_ID, null)
+        set(value) = preferences.edit(commit = true) { putString(KEY_PUSH_REGISTERED_DEVICE_ID, value) }
+
+    override var checkFrequencyMinutes: Int
+        get() = preferences.getInt(KEY_CHECK_FREQUENCY_MINUTES, 0)
+        set(value) = preferences.edit(commit = true) { putInt(KEY_CHECK_FREQUENCY_MINUTES, value) }
+
     override fun clear() {
         preferences.edit(commit = true) { clear() }
     }
@@ -86,6 +110,9 @@ class SharedPreferencesImaginaDeviceStore(context: Context) : ImaginaDeviceStore
         const val KEY_NEEDS_SIGN_IN = "needs_sign_in"
         const val KEY_LAST_SYNC_AT = "last_sync_at"
         const val KEY_ACCOUNTS = "accounts"
+        const val KEY_PUSH_TOKEN = "push_token"
+        const val KEY_PUSH_REGISTERED_DEVICE_ID = "push_registered_device_id"
+        const val KEY_CHECK_FREQUENCY_MINUTES = "check_frequency_minutes"
     }
 }
 

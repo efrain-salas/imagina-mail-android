@@ -34,6 +34,12 @@ class ImaginaDeviceSynchronizerTest {
         store = store,
         localAccounts = localAccounts,
         scheduler = scheduler,
+        push = ImaginaPushRegistrar(
+            api = api,
+            store = store,
+            tokenSource = FakeImaginaPushTokenSource(isAvailable = false),
+            logger = TestLogger(),
+        ),
         logger = TestLogger(),
         dispatcher = UnconfinedTestDispatcher(),
         clock = { NOW },

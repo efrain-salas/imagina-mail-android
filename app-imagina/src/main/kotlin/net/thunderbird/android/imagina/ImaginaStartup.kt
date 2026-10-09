@@ -17,7 +17,8 @@ import net.thunderbird.core.android.account.AccountRemovedListener
 /**
  * What Imagina Mail starts with the app (`ThunderbirdApp.onCreate`):
  *
- * - the sync with Imagina's devices API, now and every few hours (C7.3),
+ * - the sync with Imagina's devices API, now and every few hours (C7.3), which also tells Imagina the
+ *   Firebase token of the phone when it does not have it,
  * - the offer to «Entrar con Imagina» again when the last sync lost its sign-in,
  * - the disconnection of the phone when its last Imagina account is removed.
  */
@@ -26,6 +27,7 @@ class ImaginaStartup(
     private val store: ImaginaDeviceStore,
     private val synchronizer: ImaginaDeviceSynchronizer,
     private val scheduler: ImaginaSyncScheduler,
+    private val push: ImaginaPushRegistrar,
     private val preferences: Preferences,
     ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
 ) {
@@ -41,7 +43,10 @@ class ImaginaStartup(
 
         if (store.isConnected) {
             scheduler.schedule()
-            if (System.currentTimeMillis() - store.lastSyncAt > MIN_SYNC_AGE_ON_START_MILLIS) {
+            // The sync also gives Imagina the Firebase token: a phone that had no push yet (an update of the
+            // app, a token Firebase changed while the app was closed) gets it now, not in six hours
+            val syncIsDue = System.currentTimeMillis() - store.lastSyncAt > MIN_SYNC_AGE_ON_START_MILLIS
+            if (syncIsDue || push.needsRegistration) {
                 scheduler.syncSoon()
             }
         }

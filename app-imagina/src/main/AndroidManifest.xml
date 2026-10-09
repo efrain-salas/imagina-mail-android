@@ -12,6 +12,30 @@
         android:theme="@style/Theme.Thunderbird.Startup"
         >
 
+        <!-- New mail at once (IMAGINA.md, «Notificaciones»): Firebase only delivers Imagina's messages, it collects
+             nothing about the person -->
+        <meta-data
+            android:name="firebase_analytics_collection_deactivated"
+            android:value="true"
+            />
+        <meta-data
+            android:name="google_analytics_adid_collection_enabled"
+            android:value="false"
+            />
+        <meta-data
+            android:name="google_analytics_ssaid_collection_enabled"
+            android:value="false"
+            />
+
+        <service
+            android:name="net.thunderbird.android.imagina.ImaginaMessagingService"
+            android:exported="false"
+            >
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name="com.fsck.k9.ui.settings.account.OpenPgpAppSelectDialog"
             android:configChanges="locale"

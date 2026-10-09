@@ -15,4 +15,5 @@
     <string name="imagina_error_network">Impossibile raggiungere Imagina. Controlla la connessione e riprova.</string>
     <string name="imagina_error_no_mailboxes">Imagina non ha restituito nessuna casella per te.</string>
     <string name="imagina_error_unknown">Non è stato possibile configurare le tue caselle. Riprova.</string>
+    <string name="imagina_checking_mail">Controllo della tua posta…</string>
 </resources>

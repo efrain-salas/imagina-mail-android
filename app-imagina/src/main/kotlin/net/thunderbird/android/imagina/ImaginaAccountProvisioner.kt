@@ -7,6 +7,7 @@ import app.k9mail.feature.account.edit.AccountEditExternalContract.AccountUpdate
 import app.k9mail.feature.account.setup.AccountSetupExternalContract.AccountCreator
 import app.k9mail.feature.account.setup.AccountSetupExternalContract.AccountCreator.AccountCreatorResult
 import com.fsck.k9.Preferences
+import com.fsck.k9.job.K9JobManager
 import com.fsck.k9.mail.AuthType
 import com.fsck.k9.mail.ConnectionSecurity
 import com.fsck.k9.mail.ServerSettings
@@ -19,8 +20,11 @@ import net.thunderbird.feature.account.settings.api.BackgroundAccountRemover
  * mailbox, made with the credential Imagina created for this device.
  */
 interface ImaginaLocalAccounts {
-    /** Creates the account of [mailbox] and returns its uuid. */
-    suspend fun create(mailbox: ImaginaMailAccount, accountName: String): String
+    /** Creates the account of [mailbox], looking for mail by itself every [checkFrequencyMinutes]; returns its uuid. */
+    suspend fun create(mailbox: ImaginaMailAccount, accountName: String, checkFrequencyMinutes: Int): String
+
+    /** Makes the account look for mail by itself every [minutes] and reschedules its checks if that changed. */
+    fun setCheckFrequency(accountUuid: String, minutes: Int)
 
     /** Puts the servers and credential Imagina gave in the account that already exists. */
     suspend fun updateCredentials(accountUuid: String, mailbox: ImaginaMailAccount)
@@ -29,6 +33,15 @@ interface ImaginaLocalAccounts {
     fun remove(accountUuid: String)
 
     fun exists(accountUuid: String): Boolean
+}
+
+/** How often (in minutes) the accounts look for mail by themselves. */
+object ImaginaCheckFrequency {
+    /** The only way to get mail: Imagina Mail has no push of its own. */
+    const val WITHOUT_PUSH = 15
+
+    /** A safety net: Imagina wakes the app when mail arrives, and this catches a push that never came. */
+    const val WITH_PUSH = 60
 }
 
 /**
@@ -41,9 +54,10 @@ class ImaginaAccountProvisioner(
     private val serverSettingsUpdater: AccountServerSettingsUpdater,
     private val accountRemover: BackgroundAccountRemover,
     private val preferences: Preferences,
+    private val jobManager: K9JobManager,
 ) : ImaginaLocalAccounts {
 
-    override suspend fun create(mailbox: ImaginaMailAccount, accountName: String): String {
+    override suspend fun create(mailbox: ImaginaMailAccount, accountName: String, checkFrequencyMinutes: Int): String {
         val accountUuid = UUID.randomUUID().toString()
 
         val account = try {
@@ -58,7 +72,7 @@ class ImaginaAccountProvisioner(
                     accountName = accountName,
                     displayName = mailbox.name.ifBlank { mailbox.address },
                     emailSignature = null,
-                    checkFrequencyInMinutes = CHECK_FREQUENCY_MINUTES,
+                    checkFrequencyInMinutes = checkFrequencyMinutes,
                     messageDisplayCount = MESSAGE_DISPLAY_COUNT,
                     showNotification = true,
                 ),
@@ -82,6 +96,15 @@ class ImaginaAccountProvisioner(
         }
     }
 
+    override fun setCheckFrequency(accountUuid: String, minutes: Int) {
+        val account = preferences.getAccount(accountUuid) ?: return
+
+        if (account.updateAutomaticCheckIntervalMinutes(minutes)) {
+            preferences.saveAccount(account)
+            jobManager.scheduleMailSync(account)
+        }
+    }
+
     override fun remove(accountUuid: String) {
         accountRemover.removeAccountAsync(accountUuid)
     }
@@ -101,7 +124,6 @@ class ImaginaAccountProvisioner(
     }
 
     private companion object {
-        const val CHECK_FREQUENCY_MINUTES = 15
         const val MESSAGE_DISPLAY_COUNT = 25
     }
 }

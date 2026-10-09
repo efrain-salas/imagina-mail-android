@@ -15,4 +15,5 @@
     <string name="imagina_error_network">Imagina ist nicht erreichbar. Prüfe deine Internetverbindung und versuche es noch einmal.</string>
     <string name="imagina_error_no_mailboxes">Imagina hat kein Postfach für dich zurückgegeben.</string>
     <string name="imagina_error_unknown">Deine Postfächer konnten nicht eingerichtet werden. Versuche es bitte noch einmal.</string>
+    <string name="imagina_checking_mail">Deine E-Mails werden abgerufen …</string>
 </resources>

@@ -36,6 +36,15 @@ interface ImaginaDevicesApi {
 
     /** Disconnects the device and cuts all its credentials. */
     suspend fun disconnectDevice(accessToken: String, deviceId: String)
+
+    /**
+     * Gives Imagina the Firebase token of this phone (`PUT /{id}/push`), so it can wake the app when new mail
+     * arrives. Throws [ImaginaDeviceRevokedException] when the device was disconnected.
+     */
+    suspend fun registerPushToken(accessToken: String, deviceId: String, token: String)
+
+    /** Imagina forgets the Firebase token of this phone (`DELETE /{id}/push`). */
+    suspend fun forgetPushToken(accessToken: String, deviceId: String)
 }
 
 data class ImaginaDeviceRegistration(val deviceId: String, val mailboxes: List<ImaginaMailAccount>)
@@ -129,6 +138,26 @@ class HttpImaginaDevicesApi(
 
     override suspend fun disconnectDevice(accessToken: String, deviceId: String) {
         request(method = "DELETE", url = "$baseUrl/$deviceId", accessToken = accessToken).orFail()
+    }
+
+    override suspend fun registerPushToken(accessToken: String, deviceId: String, token: String) {
+        val body = buildJsonObject { put(key = "token", value = token) }
+        request(
+            method = "PUT",
+            url = "$baseUrl/$deviceId/push",
+            accessToken = accessToken,
+            body = body.toString(),
+        ).orFailOrRevoked()
+    }
+
+    override suspend fun forgetPushToken(accessToken: String, deviceId: String) {
+        request(method = "DELETE", url = "$baseUrl/$deviceId/push", accessToken = accessToken).orFailOrRevoked()
+    }
+
+    private fun HttpResult.orFailOrRevoked(): HttpResult {
+        if (status == HttpURLConnection.HTTP_GONE) throw ImaginaDeviceRevokedException()
+
+        return orFail()
     }
 
     @Suppress("TooGenericExceptionCaught")

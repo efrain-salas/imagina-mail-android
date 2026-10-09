@@ -1,3 +1,4 @@
+import groovy.json.JsonSlurper
 import java.util.Properties
 
 plugins {
@@ -21,8 +22,43 @@ val imaginaParameters: Map<String, String> = run {
     declared + read("imagina/imagina.local.properties").filterKeys { it in declared }
 }
 
+// Notifications (IMAGINA.md, «Notificaciones»): the values of Imagina's Firebase project come from the
+// google-services.json of this app (build.imagina.mail) in this folder, which is kept out of git, and become the
+// string resources Firebase starts itself from, without the Google Services plugin. Without the file the app builds
+// and runs the same, with no push and a mail check every 15 minutes.
+val firebaseResources: Map<String, String> = run {
+    val file = layout.projectDirectory.file("google-services.json").asFile
+    if (!file.exists()) return@run emptyMap()
+
+    fun fail(reason: String): Nothing = throw GradleException("${file.name}: $reason")
+    fun Any?.asMap(): Map<*, *> = this as? Map<*, *> ?: fail("it is not the file the Firebase console writes")
+    fun Map<*, *>.packageName() = this["client_info"].asMap()["android_client_info"].asMap()["package_name"]
+
+    val applicationId = imaginaParameters.getValue("IMAGINA_APPLICATION_ID")
+    val json = JsonSlurper().parseText(file.readText()).asMap()
+    val project = json["project_info"].asMap()
+    val client = (json["client"] as? List<*>).orEmpty()
+        .map { it.asMap() }
+        .firstOrNull { it.packageName() == applicationId }
+        ?: fail("no client for $applicationId; download the file of that app from the Firebase console")
+    val apiKey = (client["api_key"] as? List<*>)?.firstOrNull().asMap()["current_key"]
+
+    mapOf(
+        "google_app_id" to client["client_info"].asMap()["mobilesdk_app_id"].toString(),
+        "google_api_key" to apiKey.toString(),
+        "gcm_defaultSenderId" to project["project_number"].toString(),
+        "project_id" to project["project_id"].toString(),
+        "google_storage_bucket" to project["storage_bucket"]?.toString().orEmpty(),
+    )
+}
+
 android {
     namespace = "net.thunderbird.android"
+
+    buildFeatures {
+        // For the Firebase resources above (generated resources are off by default, see gradle.properties)
+        resValues = true
+    }
 
     defaultConfig {
         applicationId = imaginaParameters.getValue("IMAGINA_APPLICATION_ID")
@@ -37,6 +73,10 @@ android {
         // imagina/imagina.local.properties (local only) may override
         imaginaParameters.forEach { (name, value) ->
             buildConfigField("String", name, "\"$value\"")
+        }
+
+        firebaseResources.forEach { (name, value) ->
+            resValue("string", name, value)
         }
     }
 
@@ -295,6 +335,10 @@ dependencies {
     implementation(projects.feature.onboarding.main)
     implementation(projects.feature.onboarding.permissions)
     implementation(projects.mail.protocols.imap)
+
+    // New mail at once: Imagina watches each mailbox and wakes the app with a Firebase message (IMAGINA.md).
+    // Pinned here, not in Thunderbird's version catalog, so updating Thunderbird never touches it.
+    implementation("com.google.firebase:firebase-messaging:25.1.3")
 
     // TODO remove once OAuth ids have been moved from TBD to TBA
     releaseImplementation(libs.appauth)

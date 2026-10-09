@@ -34,6 +34,9 @@ sealed interface ImaginaSyncResult {
  *
  * A device is registered only when the phone has none or Imagina revoked it; signing in again with a
  * device that is still valid just brings the accounts up to date.
+ *
+ * It also tells Imagina the Firebase token of the phone ([push]) and, while Imagina has it, lets the
+ * accounts look for mail only once an hour instead of every 15 minutes.
  */
 @Suppress("TooManyFunctions", "LongParameterList")
 class ImaginaDeviceSynchronizer(
@@ -42,6 +45,7 @@ class ImaginaDeviceSynchronizer(
     private val store: ImaginaDeviceStore,
     private val localAccounts: ImaginaLocalAccounts,
     private val scheduler: ImaginaSyncScheduler,
+    private val push: ImaginaPushRegistrar,
     private val logger: Logger,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO,
     private val clock: () -> Long = System::currentTimeMillis,
@@ -85,6 +89,7 @@ class ImaginaDeviceSynchronizer(
 
         store.lastSyncAt = clock()
         store.needsSignIn = false
+        registerPushWithoutFailing(accessToken)
         scheduler.schedule()
 
         return store.accounts.firstOrNull { localAccounts.exists(it.uuid) }?.uuid
@@ -131,6 +136,7 @@ class ImaginaDeviceSynchronizer(
 
                 store.lastSyncAt = clock()
                 store.needsSignIn = false
+                ensurePushRegistered(accessToken, deviceId)
                 ImaginaSyncResult.Synced
             }
         } catch (_: ImaginaDeviceRevokedException) {
@@ -148,6 +154,28 @@ class ImaginaDeviceSynchronizer(
             }
         } catch (error: ImaginaException) {
             ImaginaSyncResult.Failed(error)
+        }
+    }
+
+    /**
+     * Firebase gave this phone a new token: gives it to Imagina right away (a push to the old one is lost) and
+     * retries with the sync when Imagina cannot be reached.
+     */
+    suspend fun onPushTokenChanged() {
+        withContext(dispatcher) {
+            mutex.withLock {
+                val deviceId = store.deviceId
+                if (deviceId != null) {
+                    try {
+                        ensurePushRegistered(session.accessToken(), deviceId)
+                    } catch (_: ImaginaDeviceRevokedException) {
+                        removeAccountsOfRevokedDevice()
+                    } catch (error: ImaginaException) {
+                        logger.warn(TAG, error) { "Imagina did not get the new Firebase token yet" }
+                        scheduler.syncSoon()
+                    }
+                }
+            }
         }
     }
 
@@ -277,7 +305,7 @@ class ImaginaDeviceSynchronizer(
             return
         }
 
-        val uuid = localAccounts.create(mailbox, accountName(mailbox, batch))
+        val uuid = localAccounts.create(mailbox, accountName(mailbox, batch), checkFrequencyMinutes())
         val account = ImaginaManagedAccount(address = mailbox.address, uuid = uuid, company = mailbox.company)
         store.accounts = store.accounts.filterNot { it.address.equals(mailbox.address, ignoreCase = true) } + account
         createdAccounts?.add(account)
@@ -299,6 +327,46 @@ class ImaginaDeviceSynchronizer(
         }
     }
 
+    /**
+     * Gives Imagina the Firebase token if it does not have it, and sets how often the accounts look for mail
+     * accordingly.
+     *
+     * @throws ImaginaException when Imagina could not be asked just now.
+     */
+    private suspend fun ensurePushRegistered(accessToken: String, deviceId: String) {
+        push.register(accessToken, deviceId)
+        applyCheckFrequency()
+    }
+
+    /** Signing in does not fail because of push: the sync tries again. */
+    @Suppress("TooGenericExceptionCaught")
+    private suspend fun registerPushWithoutFailing(accessToken: String) {
+        val deviceId = store.deviceId ?: return
+
+        try {
+            ensurePushRegistered(accessToken, deviceId)
+        } catch (error: CancellationException) {
+            throw error
+        } catch (error: Exception) {
+            logger.warn(TAG, error) { "Push could not be set up yet" }
+            scheduler.syncSoon()
+        }
+    }
+
+    /** Once an hour while Imagina wakes the app, every 15 minutes otherwise; accounts change only when that does. */
+    private fun applyCheckFrequency() {
+        val minutes = checkFrequencyMinutes()
+        if (store.checkFrequencyMinutes == minutes) return
+
+        store.accounts
+            .filter { localAccounts.exists(it.uuid) }
+            .forEach { localAccounts.setCheckFrequency(it.uuid, minutes) }
+        store.checkFrequencyMinutes = minutes
+    }
+
+    private fun checkFrequencyMinutes(): Int =
+        if (push.isActive) ImaginaCheckFrequency.WITH_PUSH else ImaginaCheckFrequency.WITHOUT_PUSH
+
     private fun removeAccount(account: ImaginaManagedAccount) {
         store.accounts = store.accounts.filterNot { it.uuid == account.uuid }
         localAccounts.remove(account.uuid)
@@ -315,6 +383,7 @@ class ImaginaDeviceSynchronizer(
     private suspend fun disconnectDevice() {
         val deviceId = store.deviceId
         if (deviceId != null) {
+            bestEffort { push.unregister(session.accessToken(), deviceId) }
             bestEffort { api.disconnectDevice(session.accessToken(), deviceId) }
         }
         store.clear()

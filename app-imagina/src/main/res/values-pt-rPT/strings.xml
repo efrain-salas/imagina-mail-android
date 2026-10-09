@@ -15,4 +15,5 @@
     <string name="imagina_error_network">Não foi possível contactar a Imagina. Verifica a tua ligação e tenta novamente.</string>
     <string name="imagina_error_no_mailboxes">A Imagina não devolveu nenhuma caixa de correio para ti.</string>
     <string name="imagina_error_unknown">Não foi possível configurar as tuas caixas de correio. Tenta novamente.</string>
+    <string name="imagina_checking_mail">A verificar o teu correio…</string>
 </resources>

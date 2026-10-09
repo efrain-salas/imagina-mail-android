@@ -15,4 +15,5 @@
     <string name="imagina_error_network">Impossible de joindre Imagina. Vérifiez votre connexion et réessayez.</string>
     <string name="imagina_error_no_mailboxes">Imagina n’a renvoyé aucune boîte mail pour vous.</string>
     <string name="imagina_error_unknown">Impossible de configurer vos boîtes mail. Veuillez réessayer.</string>
+    <string name="imagina_checking_mail">Vérification de vos e-mails…</string>
 </resources>

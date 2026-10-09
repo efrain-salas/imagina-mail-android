@@ -31,8 +31,11 @@ val imaginaModule = module {
             serverSettingsUpdater = get(),
             accountRemover = get(),
             preferences = get(),
+            jobManager = get(),
         )
     }
+    single<ImaginaPushTokenSource> { FirebaseImaginaPushTokenSource(context = androidContext(), logger = get()) }
+    single { ImaginaPushRegistrar(api = get(), store = get(), tokenSource = get(), logger = get()) }
     single {
         ImaginaDeviceSynchronizer(
             api = get(),
@@ -40,6 +43,7 @@ val imaginaModule = module {
             store = get(),
             localAccounts = get(),
             scheduler = get(),
+            push = get(),
             logger = get(),
         )
     }
@@ -49,7 +53,30 @@ val imaginaModule = module {
             store = get(),
             synchronizer = get(),
             scheduler = get(),
+            push = get(),
             preferences = get(),
+        )
+    }
+
+    // Mail arriving: Imagina's push, through Firebase, wakes the app to check the inbox
+    single<ImaginaInbox> {
+        ThunderbirdImaginaInbox(
+            preferences = get(),
+            messagingController = get(),
+            folderRepository = get(),
+            generalSettingsManager = get(),
+            logger = get(),
+        )
+    }
+    single { ImaginaInboxChecker(inbox = get()) }
+    single {
+        ImaginaPushHandler(
+            store = get(),
+            localAccounts = get(),
+            push = get(),
+            synchronizer = get(),
+            scheduler = get(),
+            logger = get(),
         )
     }
 

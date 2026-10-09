@@ -184,6 +184,63 @@ class HttpImaginaDevicesApiTest {
     }
 
     @Test
+    fun `registerPushToken puts the token and accepts the empty answer`() = runTest {
+        status = 204
+
+        api.registerPushToken(accessToken = "token-1", deviceId = "d", token = "fcm:abc")
+
+        val request = requests.single()
+        assertThat(request.method).isEqualTo("PUT")
+        assertThat(request.path).isEqualTo("/api/v1/cloud/devices/d/push")
+        assertThat(request.authorization).isEqualTo("Bearer token-1")
+        assertThat(request.body).isEqualTo("""{"token":"fcm:abc"}""")
+    }
+
+    @Test
+    fun `registerPushToken tells when the device was disconnected`() = runTest {
+        status = 410
+        response = """{"error": "revoked", "message": "Este móvil se desconectó."}"""
+
+        assertFailure { api.registerPushToken(accessToken = "token", deviceId = "d", token = "t") }
+            .isInstanceOf<ImaginaDeviceRevokedException>()
+    }
+
+    @Test
+    fun `registerPushToken passes on the refusal of Imagina`() = runTest {
+        status = 422
+        response = """{"error": "invalid_token", "message": "El token no vale."}"""
+
+        assertFailure { api.registerPushToken(accessToken = "token", deviceId = "d", token = "t") }
+            .isInstanceOf<ImaginaApiException>()
+            .all {
+                prop(ImaginaApiException::status).isEqualTo(422)
+                prop(ImaginaApiException::code).isEqualTo("invalid_token")
+            }
+    }
+
+    @Test
+    fun `forgetPushToken deletes the push of the device and accepts the empty answer`() = runTest {
+        status = 204
+
+        api.forgetPushToken(accessToken = "token-1", deviceId = "d")
+
+        val request = requests.single()
+        assertThat(request.method).isEqualTo("DELETE")
+        assertThat(request.path).isEqualTo("/api/v1/cloud/devices/d/push")
+        assertThat(request.authorization).isEqualTo("Bearer token-1")
+        assertThat(request.body).isEmpty()
+    }
+
+    @Test
+    fun `forgetPushToken tells when the device was disconnected`() = runTest {
+        status = 410
+        response = """{"error": "revoked"}"""
+
+        assertFailure { api.forgetPushToken(accessToken = "token", deviceId = "d") }
+            .isInstanceOf<ImaginaDeviceRevokedException>()
+    }
+
+    @Test
     fun `an answer that is not what the contract describes fails as a refusal`() = runTest {
         status = 201
         response = """{"device": {"id": "d"}}"""
