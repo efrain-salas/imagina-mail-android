@@ -41,6 +41,7 @@ Los servidores de correo (Migadu) y la credencial de cada buzón no son parámet
 | `settings.gradle.kts` | `":app-imagina"` en la lista de módulos | Compilar la app de Imagina. |
 | `app-common/.../BaseApplication.kt` | Propiedad `allowsDefinitionOverride` (falsa por defecto) que pasa a `DI.start` | Thunderbird prohíbe sustituir piezas de la inyección de dependencias; la app de Imagina lo activa para poner su navegación de acceso en lugar de la de Thundermail. Thunderbird y K-9 no cambian. |
 | `.gitignore` | `imagina/imagina.local.properties` | Que los valores locales no entren en git. |
+| `backend/imap/.../ImapBackendPusher.kt` | Las carpetas actuales se leen dentro del cerrojo que las escribe (`updateFolders`), marcado «Imagina (IMAGINA.md)». | Fallo de Thunderbird: al arrancar el push, la actualización de su propia corrutina podía leer la lista vacía justo antes de que llegara INBOX y luego parar el push que esta había arrancado; tras «Entrar con Imagina» el correo dejaba de llegar al momento hasta reiniciar la app. Candidato a enviarse a Thunderbird. |
 
 El resto (acceso sin contraseña, bienvenida, avisos al momento, `User-Agent`, sincronización) se hace sin tocar más ficheros de Thunderbird: con piezas de la inyección de dependencias que Imagina sustituye (ver «Cómo engancha») y recursos de `app-imagina`.
 
@@ -107,7 +108,7 @@ Genera `ic_app_logo` y `ic_app_logo_monochrome` (icono de la app) e `ic_imagina_
 ## Actualizar a una nueva versión de Thunderbird
 
 1. `git fetch upstream --tags` y `git merge THUNDERBIRD_<nueva>` sobre `main`.
-2. Cambiar `THUNDERBIRD_ANDROID_TAG` en `imagina/imagina.properties`. Los conflictos solo pueden venir de los tres ficheros de la tabla de arriba.
+2. Cambiar `THUNDERBIRD_ANDROID_TAG` en `imagina/imagina.properties`. Los conflictos solo pueden venir de los ficheros de la tabla de arriba (si Thunderbird ya corrigió el de `ImapBackendPusher`, quedarse con el suyo).
 3. Comparar `app-thunderbird` entre la versión anterior y la nueva (`git diff THUNDERBIRD_<anterior> THUNDERBIRD_<nueva> -- app-thunderbird`) y llevar a `app-imagina` lo que cambie (dependencias, módulos de Koin, manifest), salvo nombre, id e icono.
 4. Comprobar que siguen existiendo los puntos de enganche: `OnboardingNavigation`/`OnboardingRoute.Onboarding`, `AccountEditNavigation`, `AccountSetupNavigation`, `ThundermailNavigation`, `AccountSetupExternalContract.AccountCreator`, `AccountEditExternalContract.AccountServerSettingsUpdater`, `BackgroundAccountRemover`, `Preferences.addAccountRemovedListener`, la clave `<uuid>.<carpeta>.pushEnabled` de `com.fsck.k9.mailstore.FolderSettingsProvider`, el recurso `message_header_mua` y que `K9WorkerFactory` siga dejando pasar a las clases que no son de `com.fsck.k9`.
 5. Compilar, pasar `./gradlew :app-imagina:testFossDebugUnitTest` y probar en el emulador o el móvil: «Entrar con Imagina», cuentas creadas, recibir y enviar, aviso al momento.

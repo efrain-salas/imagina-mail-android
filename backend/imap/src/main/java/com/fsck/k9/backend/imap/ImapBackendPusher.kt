@@ -77,25 +77,28 @@ internal class ImapBackendPusher(
         updateFolders(folderServerIds, currentMaxPushFolders)
     }
 
+    // Imagina (IMAGINA.md): the current folders are read inside the lock that writes them. Read before it, a
+    // refresh started with the pusher could take the empty list just before the first folders arrived and then
+    // stop the push they started (seen after signing in: INBOX started and stopped in the same millisecond).
     private fun updateFolders() {
-        val currentFolderServerIds = synchronized(lock) { currentFolderServerIds }
-        updateFolders(currentFolderServerIds, currentMaxPushFolders)
+        updateFolders(null, currentMaxPushFolders)
     }
 
-    private fun updateFolders(folderServerIds: Collection<String>, maxPushFolders: Int) {
-        Log.v("ImapBackendPusher.updateFolders(): %s", folderServerIds)
-
-        val pushFolderServerIds = if (folderServerIds.size > maxPushFolders) {
-            folderServerIds.take(maxPushFolders).also { pushFolderServerIds ->
-                Log.v("..limiting Push to %d folders: %s", maxPushFolders, pushFolderServerIds)
-            }
-        } else {
-            folderServerIds
-        }
-
+    private fun updateFolders(requestedFolderServerIds: Collection<String>?, maxPushFolders: Int) {
         val stopFolderPushers: List<ImapFolderPusher>
         val startFolderPushers: List<ImapFolderPusher>
         synchronized(lock) {
+            val folderServerIds = requestedFolderServerIds ?: currentFolderServerIds
+            Log.v("ImapBackendPusher.updateFolders(): %s", folderServerIds)
+
+            val pushFolderServerIds = if (folderServerIds.size > maxPushFolders) {
+                folderServerIds.take(maxPushFolders).also { pushFolderServerIds ->
+                    Log.v("..limiting Push to %d folders: %s", maxPushFolders, pushFolderServerIds)
+                }
+            } else {
+                folderServerIds
+            }
+
             currentFolderServerIds = folderServerIds
 
             val oldRunningFolderServerIds = pushFolders.keys
