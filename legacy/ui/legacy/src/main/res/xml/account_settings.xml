@@ -43,6 +43,7 @@
             android:key="manage_identities"
             android:summary="@string/account_settings_identities_summary"
             android:title="@string/account_settings_identities_label"
+            app:isPreferenceVisible="@bool/sender_addresses_editable"
             />
 
         <ListPreference

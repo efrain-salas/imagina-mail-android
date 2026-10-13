@@ -25,6 +25,9 @@ internal object ImaginaProjectFiles {
     /** The `<string name="..">value</string>` entries of a resource file, in order. */
     fun strings(file: File): Map<String, String> = resourceEntries(file, "string")
 
+    /** The `<bool name="..">value</bool>` entries of a resource file, in order. */
+    fun bools(file: File): Map<String, String> = resourceEntries(file, "bool")
+
     private fun resourceEntries(file: File, tag: String): Map<String, String> {
         val elements = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file).getElementsByTagName(tag)
         return buildMap {

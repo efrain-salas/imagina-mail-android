@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.stringResource
 import com.fsck.k9.activity.setup.AccountSetupCompositionContract.Effect
 import com.fsck.k9.activity.setup.AccountSetupCompositionContract.Event
@@ -118,6 +119,7 @@ fun AccountSetupCompositionScreen(
                     value = state.senderEmail,
                     onValueChange = { onEvent(Event.SenderEmailChange(it)) },
                     label = stringResource(id = R.string.account_settings_email_label),
+                    isReadOnly = !booleanResource(id = R.bool.sender_addresses_editable),
                     modifier = Modifier
                         .padding(horizontal = BoltTheme.spacings.double)
                         .fillMaxWidth(),

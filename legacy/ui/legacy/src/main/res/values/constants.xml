@@ -9,4 +9,8 @@
     <string name="app_license_url" translatable="false">https://www.apache.org/licenses/LICENSE-2.0</string>
     <!-- A note at the top of the About screen: empty here, a white-label app (Imagina Mail) says what its version is -->
     <string name="about_notice" translatable="false"></string>
+    <!-- Whether a person may send from addresses of their own choosing: «Manage identities» and an editable sender
+         address in the composition defaults. A white-label app whose mailboxes only send as themselves (Imagina Mail)
+         turns it off -->
+    <bool name="sender_addresses_editable">true</bool>
 </resources>
