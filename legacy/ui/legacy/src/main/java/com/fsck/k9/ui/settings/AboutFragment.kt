@@ -115,10 +115,10 @@ class AboutFragment : Fragment() {
                                 ),
                             )
                         },
-                        displayForum = {
+                        displaySource = {
                             dispatch(
                                 Event.OnSectionContentClick(
-                                    getString(R.string.user_forum_url),
+                                    getString(R.string.app_source_url),
                                 ),
                             )
                         },
@@ -195,7 +195,7 @@ fun AboutScreen(
     displayAuthors: () -> Unit = {},
     displayLicense: () -> Unit = {},
     displayWebSite: () -> Unit = {},
-    displayForum: () -> Unit = {},
+    displaySource: () -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
     Surface(
@@ -209,6 +209,16 @@ fun AboutScreen(
         ) {
             AppLogo(logoResId = appLogoResId)
             SectionTitle(title = aboutTitle)
+            // Imagina (IMAGINA.md): empty in Thunderbird; a white-label app says here what its version is
+            val notice = stringResource(R.string.about_notice)
+            if (notice.isNotBlank()) {
+                TextBodyMedium(
+                    text = notice,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = BoltTheme.spacings.double, vertical = BoltTheme.spacings.default),
+                )
+            }
             SectionContent(
                 sectionLabel = stringResource(R.string.version),
                 sectionText = versionNumber,
@@ -239,11 +249,12 @@ fun AboutScreen(
                 onClick = displayWebSite,
             )
 
+            // Imagina (IMAGINA.md): the source code in place of the user forum, which Imagina's version does not have
             SectionContent(
-                sectionLabel = stringResource(R.string.user_forum_title),
-                sectionText = stringResource(R.string.user_forum_url),
-                sectionImageId = DesignSystemR.drawable.ic_forum,
-                onClick = displayForum,
+                sectionLabel = stringResource(R.string.source_code),
+                sectionText = stringResource(R.string.app_source_url),
+                sectionImageId = DesignSystemR.drawable.ic_code,
+                onClick = displaySource,
             )
 
             SectionTitle(title = librariesTitle)

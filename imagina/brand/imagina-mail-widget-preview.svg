@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 336 252" font-family="Helvetica, Arial, sans-serif">
+  <rect width="336" height="252" fill="#F8F7F4"/>
+  <rect width="336" height="50" fill="#F1F0EC"/>
+  <text x="14" y="32" font-size="19" fill="#1A1B25">Unified Inbox</text>
+  <path d="M297,35.5L297,30.5L309.5,18L314,22.5L301.5,35L296.5,35.5Z M306.8,20.7L311.3,25.2" fill="none" stroke="#1A1B25" stroke-width="2" stroke-linejoin="round"/>
+  <text x="14" y="76" font-size="15" font-weight="700" fill="#1A1B25">Welcome to Imagina Mail</text>
+  <text x="322" y="76" font-size="12" font-weight="700" fill="#1A1B25" text-anchor="end">13 Oct</text>
+  <text x="14" y="94" font-size="13" font-weight="700" fill="#1A1B25">Imagina</text>
+  <text x="14" y="111" font-size="12" fill="#474B57">Your mailboxes set themselves up when you sign in</text>
+  <rect x="0" y="120" width="336" height="1" fill="#E8E6E1"/>
+  <text x="14" y="145" font-size="15" fill="#474B57">Your Cloud is ready</text>
+  <text x="322" y="145" font-size="12" fill="#5E6270" text-anchor="end">12 Oct</text>
+  <text x="14" y="163" font-size="13" fill="#474B57">Imagina</text>
+  <text x="14" y="180" font-size="12" fill="#5E6270">Mail, files and calendars in one place</text>
+  <rect x="0" y="189" width="336" height="1" fill="#E8E6E1"/>
+  <text x="14" y="214" font-size="15" fill="#474B57">Invoice 2026-0042</text>
+  <text x="322" y="214" font-size="12" fill="#5E6270" text-anchor="end">9 Oct</text>
+  <text x="14" y="232" font-size="13" fill="#474B57">Casa Pepe</text>
+  <text x="14" y="249" font-size="12" fill="#5E6270">Attached you will find the invoice for the</text>
+</svg>

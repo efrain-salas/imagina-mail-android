@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Imagina's colours for the screens of Thunderbird (IMAGINA.md, «Colores»): the Material 3 roles of the
+    design system «Light Craft» (resources/ui/tokens.css in Imagina), in the light and the dark theme.
+
+    The names are Thunderbird's (core/ui/legacy/theme2/thunderbird/.../colors.xml): a resource of the app
+    replaces the one of a library with the same name, so Theme2.Thunderbird.Light and .Dark, and with them
+    the XML screens, take these colours without touching a file of Thunderbird. ImaginaBoltTheme (Compose)
+    reads the same resources, so there is one palette. The names with Info, Success and Warning are not in
+    Thunderbird's XML: only Compose's theme uses them.
+
+    How the roles come from the design system (light / dark):
+      primary                accent #0F766E / #2DD4BF, text on it on-accent #FFFFFF / #0B2B28
+      primaryContainer       accent-soft #CCFBF1 / #123C38, text on it accent-soft-text #134E4A / #99F6E4
+      secondary              accent-hover #115E59 / #5EEAD4 (the selection, secondaryContainer, is accent-soft)
+      surface                canvas #F8F7F4 / #111219; the surface containers go from white / #1A1B25 (the
+                             surface of cards) to surface-muted and border, so the top bar is a little apart
+                             from the list
+      onSurface              ink #1A1B25 / #F3F2EE; onSurfaceVariant ink-secondary #474B57 / #C9CBD3
+      outline, outlineVariant border-control #8A8880 / #6E7284, border-strong #D4D2CD / #3A3D4E
+      error, info, success, warning   danger, info, success and warning, with their -soft background
+    The brand teal #0D9488 is not here: it is only for logos and graphics, never for text or buttons.
+
+    The text pairs keep 4.5:1 in both themes; ImaginaColorsTest checks it, so a change here that breaks it fails.
+-->
+<resources>
+    <!-- Light Theme -->
+    <color name="lightPrimary">#0F766E</color>
+    <color name="lightOnPrimary">#FFFFFF</color>
+    <color name="lightPrimaryContainer">#CCFBF1</color>
+    <color name="lightOnPrimaryContainer">#134E4A</color>
+
+    <color name="lightSecondary">#115E59</color>
+    <color name="lightOnSecondary">#FFFFFF</color>
+    <color name="lightSecondaryContainer">#CCFBF1</color>
+    <color name="lightOnSecondaryContainer">#134E4A</color>
+
+    <color name="lightTertiary">#474B57</color>
+    <color name="lightOnTertiary">#FFFFFF</color>
+    <color name="lightTertiaryContainer">#E8E6E1</color>
+    <color name="lightOnTertiaryContainer">#1A1B25</color>
+
+    <color name="lightError">#B42318</color>
+    <color name="lightOnError">#FFFFFF</color>
+    <color name="lightErrorContainer">#FEF3F2</color>
+    <color name="lightOnErrorContainer">#B42318</color>
+
+    <color name="lightSurfaceDim">#EEECE7</color>
+    <color name="lightSurface">#F8F7F4</color>
+    <color name="lightSurfaceBright">#FFFFFF</color>
+    <color name="lightOnSurface">#1A1B25</color>
+    <color name="lightOnSurfaceVariant">#474B57</color>
+
+    <color name="lightSurfaceContainerLowest">#FFFFFF</color>
+    <color name="lightSurfaceContainerLow">#F5F4F0</color>
+    <color name="lightSurfaceContainer">#F1F0EC</color>
+    <color name="lightSurfaceContainerHigh">#EFEEEA</color>
+    <color name="lightSurfaceContainerHighest">#EEECE7</color>
+
+    <color name="lightSurfaceInverse">#1A1B25</color>
+    <color name="lightOnSurfaceInverse">#F3F2EE</color>
+    <color name="lightPrimaryInverse">#2DD4BF</color>
+
+    <color name="lightOutline">#8A8880</color>
+    <color name="lightOutlineVariant">#D4D2CD</color>
+
+    <color name="lightPrimaryFixed">#CCFBF1</color>
+    <color name="lightOnPrimaryFixed">#042F2E</color>
+    <color name="lightPrimaryFixedDim">#99F6E4</color>
+    <color name="lightOnPrimaryFixedVariant">#115E59</color>
+
+    <color name="lightSecondaryFixed">#CCFBF1</color>
+    <color name="lightOnSecondaryFixed">#042F2E</color>
+    <color name="lightSecondaryFixedDim">#99F6E4</color>
+    <color name="lightOnSecondaryFixedVariant">#115E59</color>
+
+    <color name="lightTertiaryFixed">#E8E6E1</color>
+    <color name="lightOnTertiaryFixed">#1A1B25</color>
+    <color name="lightTertiaryFixedDim">#D4D2CD</color>
+    <color name="lightOnTertiaryFixedVariant">#474B57</color>
+
+    <color name="lightInfo">#075985</color>
+    <color name="lightOnInfo">#FFFFFF</color>
+    <color name="lightInfoContainer">#EFF8FF</color>
+    <color name="lightOnInfoContainer">#075985</color>
+
+    <color name="lightSuccess">#166534</color>
+    <color name="lightOnSuccess">#FFFFFF</color>
+    <color name="lightSuccessContainer">#EFFAF3</color>
+    <color name="lightOnSuccessContainer">#166534</color>
+
+    <color name="lightWarning">#8A4B08</color>
+    <color name="lightOnWarning">#FFFFFF</color>
+    <color name="lightWarningContainer">#FFF8EB</color>
+    <color name="lightOnWarningContainer">#8A4B08</color>
+
+    <!-- Dark Theme -->
+    <color name="darkPrimary">#2DD4BF</color>
+    <color name="darkOnPrimary">#0B2B28</color>
+    <color name="darkPrimaryContainer">#123C38</color>
+    <color name="darkOnPrimaryContainer">#99F6E4</color>
+
+    <color name="darkSecondary">#5EEAD4</color>
+    <color name="darkOnSecondary">#0B2B28</color>
+    <color name="darkSecondaryContainer">#123C38</color>
+    <color name="darkOnSecondaryContainer">#99F6E4</color>
+
+    <color name="darkTertiary">#C9CBD3</color>
+    <color name="darkOnTertiary">#1A1B25</color>
+    <color name="darkTertiaryContainer">#2A2C3A</color>
+    <color name="darkOnTertiaryContainer">#F3F2EE</color>
+
+    <color name="darkError">#F97066</color>
+    <color name="darkOnError">#1A0B0A</color>
+    <color name="darkErrorContainer">#3A1A1A</color>
+    <color name="darkOnErrorContainer">#F97066</color>
+
+    <color name="darkSurfaceDim">#0D0E13</color>
+    <color name="darkSurface">#111219</color>
+    <color name="darkSurfaceBright">#2A2C3A</color>
+    <color name="darkOnSurface">#F3F2EE</color>
+    <color name="darkOnSurfaceVariant">#C9CBD3</color>
+
+    <color name="darkSurfaceContainerLowest">#0D0E13</color>
+    <color name="darkSurfaceContainerLow">#15161E</color>
+    <color name="darkSurfaceContainer">#1A1B25</color>
+    <color name="darkSurfaceContainerHigh">#22242F</color>
+    <color name="darkSurfaceContainerHighest">#2A2C3A</color>
+
+    <color name="darkSurfaceInverse">#F3F2EE</color>
+    <color name="darkOnSurfaceInverse">#1A1B25</color>
+    <color name="darkPrimaryInverse">#0F766E</color>
+
+    <color name="darkOutline">#6E7284</color>
+    <color name="darkOutlineVariant">#3A3D4E</color>
+
+    <color name="darkPrimaryFixed">#99F6E4</color>
+    <color name="darkOnPrimaryFixed">#042F2E</color>
+    <color name="darkPrimaryFixedDim">#5EEAD4</color>
+    <color name="darkOnPrimaryFixedVariant">#115E59</color>
+
+    <color name="darkSecondaryFixed">#99F6E4</color>
+    <color name="darkOnSecondaryFixed">#042F2E</color>
+    <color name="darkSecondaryFixedDim">#5EEAD4</color>
+    <color name="darkOnSecondaryFixedVariant">#115E59</color>
+
+    <color name="darkTertiaryFixed">#E8E6E1</color>
+    <color name="darkOnTertiaryFixed">#1A1B25</color>
+    <color name="darkTertiaryFixedDim">#D4D2CD</color>
+    <color name="darkOnTertiaryFixedVariant">#474B57</color>
+
+    <color name="darkInfo">#7DD3FC</color>
+    <color name="darkOnInfo">#0C2A3A</color>
+    <color name="darkInfoContainer">#0C2A3A</color>
+    <color name="darkOnInfoContainer">#7DD3FC</color>
+
+    <color name="darkSuccess">#4ADE80</color>
+    <color name="darkOnSuccess">#0F2E1C</color>
+    <color name="darkSuccessContainer">#0F2E1C</color>
+    <color name="darkOnSuccessContainer">#4ADE80</color>
+
+    <color name="darkWarning">#F5B544</color>
+    <color name="darkOnWarning">#35270F</color>
+    <color name="darkWarningContainer">#35270F</color>
+    <color name="darkOnWarningContainer">#F5B544</color>
+
+</resources>

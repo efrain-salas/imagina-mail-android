@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From Android 9 the system can switch its theme, so the cold start follows it (see values/themes.xml) -->
+    <style name="Theme.Thunderbird.Startup" parent="Theme.Thunderbird.DayNight" />
+</resources>

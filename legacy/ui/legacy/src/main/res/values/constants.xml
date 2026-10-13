@@ -7,4 +7,6 @@
     <string name="app_authors_url" translatable="false">https://github.com/thunderbird/thunderbird-android/graphs/contributors</string>
     <string name="app_source_url" translatable="false">https://github.com/thunderbird/thunderbird-android</string>
     <string name="app_license_url" translatable="false">https://www.apache.org/licenses/LICENSE-2.0</string>
+    <!-- A note at the top of the About screen: empty here, a white-label app (Imagina Mail) says what its version is -->
+    <string name="about_notice" translatable="false"></string>
 </resources>

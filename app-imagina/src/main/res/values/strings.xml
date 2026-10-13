@@ -19,4 +19,5 @@
     <string name="imagina_error_no_mailboxes">Imagina did not return any mailbox for you.</string>
     <string name="imagina_error_unknown">Your mailboxes could not be set up. Please try again.</string>
     <string name="imagina_checking_mail">Checking your mail…</string>
+    <string name="about_notice">Imagina Mail is a version of Thunderbird for Android modified by Imagina. It is not the official Thunderbird app, and neither Mozilla nor MZLA Technologies endorse or support it. It is free software under the Apache License 2.0, and its source code is available below.</string>
 </resources>

@@ -52,6 +52,28 @@ val firebaseResources: Map<String, String> = run {
     )
 }
 
+// The version of the Thunderbird app this one follows: app-thunderbird/build.gradle.kts (as the module of the
+// app is a copy of it). Read as text because a build file cannot be asked for the values of another module's
+// android block; a change in how Thunderbird writes them breaks the build here, with the reason, not the version.
+class ThunderbirdVersion(val code: Int, val name: String)
+
+val thunderbirdVersion: ThunderbirdVersion = run {
+    val file = isolated.rootProject.projectDirectory.file("app-thunderbird/build.gradle.kts")
+    val text = providers.fileContents(file).asText.get()
+    fun declared(pattern: String, what: String): String = Regex(pattern).find(text)?.groupValues?.get(1)
+        ?: throw GradleException(
+            "${file.asFile.path}: no $what found; Imagina Mail takes its version from there (IMAGINA.md, «Versión»)",
+        )
+
+    ThunderbirdVersion(
+        code = declared("""versionCode\s*=\s*(\d+)""", "versionCode").toInt(),
+        name = declared("""versionName\s*=\s*"([^"]+)"""", "versionName"),
+    )
+}
+
+// What follows Thunderbird's version in the name Imagina Mail shows: 24.0 becomes 24.0-imagina
+val imaginaVersionSuffix = "-imagina"
+
 android {
     namespace = "net.thunderbird.android"
 
@@ -64,8 +86,10 @@ android {
         applicationId = imaginaParameters.getValue("IMAGINA_APPLICATION_ID")
         testApplicationId = imaginaParameters.getValue("IMAGINA_APPLICATION_ID") + ".tests"
 
-        versionCode = 33
-        versionName = "0.1"
+        // The version of Thunderbird this one is made from (IMAGINA.md, «Versión»): its versionCode and its versionName
+        // with Imagina's suffix, taken from where app-thunderbird declares them, so updating Thunderbird updates them
+        versionCode = thunderbirdVersion.code
+        versionName = "${thunderbirdVersion.name}$imaginaVersionSuffix"
 
         buildConfigField("String", "CLIENT_INFO_APP_NAME", "\"Imagina Mail\"")
 
@@ -270,13 +294,6 @@ androidComponents {
     }
 }
 
-// Initialize placeholders for the product flavor and build type combinations needed for dependency declarations.
-// They are required to avoid "Unresolved configuration" errors.
-val fullDebugImplementation = configurations.create("fullDebugImplementation")
-val fullDailyImplementation = configurations.create("fullDailyImplementation")
-val fullBetaImplementation = configurations.create("fullBetaImplementation")
-val fullReleaseImplementation = configurations.create("fullReleaseImplementation")
-
 dependencies {
     implementation(projects.appCommon)
     implementation(projects.core.ui.compose.common)
@@ -311,12 +328,9 @@ dependencies {
     debugImplementation(projects.feature.autodiscovery.demo)
     "dailyImplementation"(projects.feature.autodiscovery.demo)
 
-    "fossImplementation"(projects.feature.funding.link)
-
-    fullDebugImplementation(projects.feature.funding.googleplay)
-    fullDailyImplementation(projects.feature.funding.googleplay)
-    fullBetaImplementation(projects.feature.funding.googleplay)
-    fullReleaseImplementation(projects.feature.funding.googleplay)
+    // Imagina Mail asks for no donations (neither Thunderbird's link nor the Google Play contribution): the funding
+    // feature is its «no funding» version in every flavor, so the app shows no «Support» entry and no reminder
+    implementation(projects.feature.funding.noop)
 
     implementation(projects.feature.onboarding.migration.thunderbird)
     implementation(projects.feature.migration.launcher.thunderbird)

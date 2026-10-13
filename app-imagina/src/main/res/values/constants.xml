@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Overrides the one of Thunderbird (legacy/ui/legacy): the User-Agent header of the mail the app sends -->
+    <!-- Overrides the ones of Thunderbird (legacy/ui/legacy, IMAGINA.md, «Textos y enlaces»): the User-Agent header
+         of the mail the app sends, and the links of the About and Settings screens, which are Imagina's, not
+         Thunderbird's or Mozilla's. test/.../ImaginaLinksTest checks that every link of Thunderbird is overridden. -->
     <string name="message_header_mua" translatable="false">Imagina Mail</string>
+    <string name="app_webpage_url" translatable="false">https://imagina.build</string>
+    <string name="user_forum_url" translatable="false">https://imagina.build</string>
+    <string name="app_authors_url" translatable="false">https://github.com/efrain-salas/imagina-mail-android/graphs/contributors</string>
+    <string name="app_source_url" translatable="false">https://github.com/efrain-salas/imagina-mail-android</string>
+    <!-- Imagina Mail asks for no donations and has no funding screen (it has Thunderbird's «no funding» module): the
+         link only stays here so that Thunderbird's donation page is not in the app -->
+    <string name="funding_url" translatable="false">https://imagina.build</string>
 </resources>

@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="launcher_icon_background">#1A1B25</color>
+
+    <!-- The accent of the design system (#0F766E, 5.5:1 with white): the swipe actions «select» and «mark as read»
+         in both themes, as the swipe colours of Thunderbird are their own colour with a white icon on it -->
+    <color name="imagina_swipe_accent">#0F766E</color>
 </resources>
