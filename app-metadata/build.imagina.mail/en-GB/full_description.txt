@@ -1,0 +1,14 @@
+Imagina Mail is the email app for companies that have their email in Imagina Cloud. You sign in with your mobile number and your mailboxes appear on their own: no servers, ports or passwords to write down.
+
+• All your mailboxes in one app, including those of several companies.
+• New email notifications straight away.
+• Your company's signature, already set in every mailbox.
+• Unified inbox, folders, search and attachments.
+• A widget with your unread emails.
+• Dark mode.
+
+When a company stops giving you access to a mailbox, it disappears from your phone without you having to do anything.
+
+You need an Imagina Cloud account with email, which your company creates in Imagina. If your company doesn't have Imagina Cloud yet, tell us at imagina.build.
+
+Imagina Mail is a modified version of Thunderbird for Android, made by Imagina. It is not the official Thunderbird app and is not endorsed by MZLA Technologies or Mozilla. Its source code is published at github.com/efrain-salas/imagina-mail-android.

@@ -1,0 +1,14 @@
+Imagina Mail es la app de correo de las empresas que tienen su correo en Imagina Cloud. Entras con tu número de móvil y tus buzones aparecen solos: sin servidores, puertos ni contraseñas que apuntar.
+
+• Todos tus buzones en una sola app, también los de varias empresas.
+• Avisos de correo nuevo al momento.
+• La firma de tu empresa, ya puesta en cada buzón.
+• Bandeja unificada, carpetas, búsqueda y adjuntos.
+• Un widget con tus correos sin leer.
+• Modo oscuro.
+
+Cuando una empresa deja de darte acceso a un buzón, desaparece de tu móvil sin que tengas que hacer nada.
+
+Necesitas una cuenta de Imagina Cloud con correo, que crea tu empresa desde Imagina. Si tu empresa todavía no tiene Imagina Cloud, cuéntanoslo en imagina.build.
+
+Imagina Mail es una versión modificada de Thunderbird para Android, hecha por Imagina. No es la app oficial de Thunderbird ni está respaldada por MZLA Technologies ni por Mozilla. Su código está publicado en github.com/efrain-salas/imagina-mail-android.
