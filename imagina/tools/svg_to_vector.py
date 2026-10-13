@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Converts Imagina's simple brand SVGs (path, circle, rect, <g transform="translate(...)">) into
+"""Converts Imagina's simple brand SVGs (path, circle, rect, and translate(...) on them or on a <g>) into
 Android VectorDrawable XML, so brand images live as SVG sources in imagina/brand/ and the app
 resources are generated from them (see IMAGINA.md, «Imágenes de marca»).
 
@@ -30,30 +30,34 @@ def rect_path(x, y, w, h, rx):
             f'V{y + rx:g}A{rx:g},{rx:g} 0 0,1 {x + rx:g},{y:g}Z')
 
 
+def translation(node):
+    """The translate(x y) of a node's transform attribute, (0, 0) if it has none."""
+    match = re.match(r'translate\(\s*([-\d.]+)[ ,]+([-\d.]+)\s*\)', node.get('transform', ''))
+    return (float(match.group(1)), float(match.group(2))) if match else (0.0, 0.0)
+
+
 def shapes(node, inherited_fill=None):
     """Yields (pathData, attributes, translate) for every drawable element."""
     fill = node.get('fill', inherited_fill)
     for child in node:
         tag = child.tag.replace(SVG, '')
         if tag == 'g':
-            tx = ty = 0.0
-            match = re.match(r'translate\(\s*([-\d.]+)[ ,]+([-\d.]+)\s*\)', child.get('transform', ''))
-            if match:
-                tx, ty = float(match.group(1)), float(match.group(2))
+            tx, ty = translation(child)
             for d, attrs, (gx, gy) in shapes(child, child.get('fill', fill)):
                 yield d, attrs, (gx + tx, gy + ty)
             continue
+        offset = translation(child)
         attrs = {k: child.get(k) for k in ('fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin')}
         attrs['element'] = tag
         attrs['fill'] = attrs['fill'] or fill
         if tag == 'path':
-            yield child.get('d'), attrs, (0.0, 0.0)
+            yield child.get('d'), attrs, offset
         elif tag == 'circle':
-            yield circle_path(float(child.get('cx')), float(child.get('cy')), float(child.get('r'))), attrs, (0.0, 0.0)
+            yield circle_path(float(child.get('cx')), float(child.get('cy')), float(child.get('r'))), attrs, offset
         elif tag == 'rect':
             attrs['element'] = 'rect'
             yield rect_path(float(child.get('x', 0)), float(child.get('y', 0)), float(child.get('width')),
-                            float(child.get('height')), float(child.get('rx', 0))), attrs, (0.0, 0.0)
+                            float(child.get('height')), float(child.get('rx', 0))), attrs, offset
 
 
 def main():

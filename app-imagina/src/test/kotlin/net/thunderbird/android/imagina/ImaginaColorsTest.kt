@@ -66,6 +66,75 @@ class ImaginaColorsTest {
         assertThat(color("darkPrimary")).isEqualTo(0x2DD4BF)
     }
 
+    @Test
+    fun `the background is the cream canvas and the cards are white, never teal`() {
+        assertThat(color("lightSurface")).isEqualTo(0xF8F7F4)
+        assertThat(color("darkSurface")).isEqualTo(0x111219)
+        // Material paints the cards, the bottom sheets and the drawer with surfaceContainerLow: the surface (white)
+        assertThat(color("lightSurfaceContainerLow")).isEqualTo(0xFFFFFF)
+        assertThat(color("darkSurfaceContainerLow")).isEqualTo(0x1A1B25)
+        // What the XML screens paint behind everything and under the toolbar is a surface role, not an accent one
+        val theme = ImaginaProjectFiles.root("core/ui/legacy/theme2/thunderbird/src/main/res/values/themes.xml")
+        listOf("Theme2.Thunderbird.Light" to "light", "Theme2.Thunderbird.Dark" to "dark").forEach { (style, prefix) ->
+            val items = ImaginaProjectFiles.items(theme, "style", style).toMap()
+
+            assertThat(items["android:colorBackground"]).isEqualTo("@color/${prefix}Surface")
+            assertThat(items["colorSurface"]).isEqualTo("@color/${prefix}Surface")
+        }
+    }
+
+    @Test
+    fun `the avatars of senders with no picture are Imagina's tones, with the white letter readable on each`() {
+        val avatars = ImaginaProjectFiles.colors(ImaginaProjectFiles.module("src/main/res/values/imagina_colors.xml"))
+            .filterKeys { it.startsWith("imagina_contact_picture_") }
+        val themes = ImaginaProjectFiles.module("src/main/res/values/themes.xml")
+
+        val tooPale = avatars.mapNotNull { (name, value) ->
+            val ratio = contrast(0xFFFFFF, value.drop(1).toInt(16))
+            "$name $value: ${"%.2f".format(ratio)}".takeIf { ratio < MINIMUM_TEXT_CONTRAST }
+        }
+        val notImagina = listOf("Light" to "light", "Dark" to "dark").flatMap { (style, theme) ->
+            val items = ImaginaProjectFiles.items(themes, "style", "Theme.Thunderbird.$style").toMap()
+            listOf(
+                "contactPictureFallbackBackgroundColors" to "@array/imagina_contact_picture_colors_$theme",
+                "contactPictureFallbackDefaultBackgroundColor" to "@color/imagina_contact_picture_default",
+            ).filter { (item, expected) -> items[item] != expected }.map { "$style: ${it.first}" }
+        }
+
+        assertThat(avatars.size).isEqualTo(AVATAR_COLOURS * 2 + 1)
+        assertThat(tooPale).isEmpty()
+        assertThat(notImagina).isEmpty()
+    }
+
+    @Test
+    fun `the widget of the message list has Imagina's colours in both themes and its text is readable`() {
+        val widget = ImaginaProjectFiles.colors(
+            ImaginaProjectFiles.root("feature/widget/message-list/src/main/res/values/colors.xml"),
+        )
+        val light = ImaginaProjectFiles.colors(ImaginaProjectFiles.module("src/main/res/values/imagina_colors.xml"))
+        val dark = ImaginaProjectFiles.colors(
+            ImaginaProjectFiles.module("src/main/res/values-night/imagina_colors.xml"),
+        )
+
+        assertThat(widget.keys.filter { it !in light || it !in dark }).isEmpty()
+        listOf("light" to light, "dark" to dark).forEach { (theme, colours) ->
+            fun hex(name: String) = colours.getValue(name).drop(1).toInt(16)
+            // The list is drawn on the window background, the header on its own colour
+            val pairs = listOf(
+                "message_list_widget_header_text" to "message_list_widget_header_background",
+                "message_list_widget_text_read" to null,
+                "message_list_widget_text_unread" to null,
+            )
+            val failures = pairs.mapNotNull { (text, background) ->
+                val backgroundColour = background?.let(::hex) ?: color("${theme}Surface")
+                val ratio = contrast(hex(text), backgroundColour)
+                "$theme $text: ${"%.2f".format(ratio)}".takeIf { ratio < MINIMUM_TEXT_CONTRAST }
+            }
+
+            assertThat(failures).isEmpty()
+        }
+    }
+
     private fun color(name: String): Int {
         val value = imagina[name] ?: error("$name is not in imagina_theme_colors.xml")
         check(Regex("#[0-9A-Fa-f]{6}").matches(value)) { "$name is $value, an opaque #RRGGBB colour was expected" }
@@ -90,6 +159,7 @@ class ImaginaColorsTest {
         val THEMES = listOf("light", "dark")
         const val MINIMUM_TEXT_CONTRAST = 4.5
         const val MINIMUM_GRAPHIC_CONTRAST = 3.0
+        const val AVATAR_COLOURS = 10
 
         val surfaces = listOf(
             "Surface",

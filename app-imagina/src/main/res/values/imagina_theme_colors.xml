@@ -19,6 +19,9 @@
       onSurface              ink #1A1B25 / #F3F2EE; onSurfaceVariant ink-secondary #474B57 / #C9CBD3
       outline, outlineVariant border-control #8A8880 / #6E7284, border-strong #D4D2CD / #3A3D4E
       error, info, success, warning   danger, info, success and warning, with their -soft background
+      surfaceContainerLow    surface #FFFFFF / #1A1B25: the cards, the bottom sheets and the drawer, which Material
+                             paints with this role, are white on the canvas, as the design system's cards, sidebar
+                             and drawer
     The brand teal #0D9488 is not here: it is only for logos and graphics, never for text or buttons.
 
     The text pairs keep 4.5:1 in both themes; ImaginaColorsTest checks it, so a change here that breaks it fails.
@@ -52,7 +55,7 @@
     <color name="lightOnSurfaceVariant">#474B57</color>
 
     <color name="lightSurfaceContainerLowest">#FFFFFF</color>
-    <color name="lightSurfaceContainerLow">#F5F4F0</color>
+    <color name="lightSurfaceContainerLow">#FFFFFF</color>
     <color name="lightSurfaceContainer">#F1F0EC</color>
     <color name="lightSurfaceContainerHigh">#EFEEEA</color>
     <color name="lightSurfaceContainerHighest">#EEECE7</color>
@@ -122,7 +125,7 @@
     <color name="darkOnSurfaceVariant">#C9CBD3</color>
 
     <color name="darkSurfaceContainerLowest">#0D0E13</color>
-    <color name="darkSurfaceContainerLow">#15161E</color>
+    <color name="darkSurfaceContainerLow">#1A1B25</color>
     <color name="darkSurfaceContainer">#1A1B25</color>
     <color name="darkSurfaceContainerHigh">#22242F</color>
     <color name="darkSurfaceContainerHighest">#2A2C3A</color>

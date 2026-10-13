@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -86,18 +86,19 @@ private fun ImaginaSignInContent(
             verticalArrangement = Arrangement.spacedBy(BoltTheme.spacings.triple, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            // The brand's logotype, «imagina /mail», in place of the mark and the name as text (its reverse in the
+            // dark theme comes from drawable-night). The name is what a screen reader says.
             Image(
-                painter = painterResource(R.drawable.ic_imagina_mark),
-                contentDescription = null,
-                modifier = Modifier.size(LOGO_SIZE_DP.dp),
+                painter = painterResource(R.drawable.ic_imagina_wordmark),
+                contentDescription = stringResource(R.string.app_name),
+                modifier = Modifier.height(WORDMARK_HEIGHT_DP.dp),
             )
-            TextHeadlineMedium(
-                text = when (mode) {
-                    ImaginaSignInMode.Onboarding -> stringResource(R.string.app_name)
-                    ImaginaSignInMode.Reconnect -> stringResource(R.string.imagina_reconnect_title)
-                },
-                textAlign = TextAlign.Center,
-            )
+            if (mode == ImaginaSignInMode.Reconnect) {
+                TextHeadlineMedium(
+                    text = stringResource(R.string.imagina_reconnect_title),
+                    textAlign = TextAlign.Center,
+                )
+            }
             TextBodyLarge(
                 text = when (mode) {
                     ImaginaSignInMode.Onboarding -> stringResource(R.string.imagina_sign_in_description)
@@ -129,7 +130,7 @@ private fun ImaginaSignInContent(
     }
 }
 
-private const val LOGO_SIZE_DP = 88
+private const val WORDMARK_HEIGHT_DP = 40
 
 private fun ImaginaSignInViewModel.Reason.messageResource(): Int = when (this) {
     ImaginaSignInViewModel.Reason.BrowserNotAvailable -> R.string.imagina_error_browser_not_available

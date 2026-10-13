@@ -5,4 +5,77 @@
     <!-- The accent of the design system (#0F766E, 5.5:1 with white): the swipe actions «select» and «mark as read»
          in both themes, as the swipe colours of Thunderbird are their own colour with a white icon on it -->
     <color name="imagina_swipe_accent">#0F766E</color>
+
+    <!--
+        The home screen widget of the message list (feature/widget/message-list): Thunderbird gives it a grey header
+        (#737373) and black text on whatever the window background is, which in the dark theme is dark. Imagina's:
+        the header and the list on the cream surface (surface-muted for the header, as the toolbar of the app), ink
+        for the text, and the dark versions in values-night/imagina_colors.xml. The names are the widget's; the
+        compose icon takes ?attr/colorControlNormal. ImaginaColorsTest checks the contrast.
+    -->
+    <color name="message_list_widget_header_background">#F1F0EC</color>
+    <color name="message_list_widget_header_text">#1A1B25</color>
+    <color name="message_list_widget_divider">#E8E6E1</color>
+    <color name="message_list_widget_text_read">#5E6270</color>
+    <color name="message_list_widget_text_unread">#1A1B25</color>
+
+    <!-- The circle of a sender with no picture when the app does not colour them: the neutral of the design system
+         (ink-muted, 5.9:1 with the white letter), in both themes -->
+    <color name="imagina_contact_picture_default">#5E6270</color>
+
+    <!--
+        The circles of the senders with no picture (the letter is always white, so each colour keeps 4.5:1 with white;
+        ImaginaColorsTest checks it). Thunderbird's are the rainbow of Material (lavender, pink, light blue…), which
+        paints the message list with colours that are not Imagina's: these are deep, earthy tones that sit on the ivory
+        and the ink, with no teal (the accent is for what the person can act on). Slate, stone, brick, clay, ochre,
+        olive, forest, steel blue and ink. The dark theme has the same hues a step lighter, to stand out from the
+        ink background.
+    -->
+    <color name="imagina_contact_picture_light_slate">#475569</color>
+    <color name="imagina_contact_picture_light_stone">#57534E</color>
+    <color name="imagina_contact_picture_light_brick">#991B1B</color>
+    <color name="imagina_contact_picture_light_clay">#9A3412</color>
+    <color name="imagina_contact_picture_light_ochre">#854D0E</color>
+    <color name="imagina_contact_picture_light_olive">#3F6212</color>
+    <color name="imagina_contact_picture_light_forest">#166534</color>
+    <color name="imagina_contact_picture_light_steel">#075985</color>
+    <color name="imagina_contact_picture_light_muted">#5E6270</color>
+    <color name="imagina_contact_picture_light_ink">#1A1B25</color>
+
+    <color name="imagina_contact_picture_dark_slate">#64748B</color>
+    <color name="imagina_contact_picture_dark_stone">#78716C</color>
+    <color name="imagina_contact_picture_dark_brick">#B91C1C</color>
+    <color name="imagina_contact_picture_dark_clay">#C2410C</color>
+    <color name="imagina_contact_picture_dark_ochre">#A16207</color>
+    <color name="imagina_contact_picture_dark_olive">#4D7C0F</color>
+    <color name="imagina_contact_picture_dark_forest">#15803D</color>
+    <color name="imagina_contact_picture_dark_steel">#0369A1</color>
+    <color name="imagina_contact_picture_dark_muted">#5E6270</color>
+    <color name="imagina_contact_picture_dark_ink">#474B57</color>
+
+    <integer-array name="imagina_contact_picture_colors_light">
+        <item>@color/imagina_contact_picture_light_slate</item>
+        <item>@color/imagina_contact_picture_light_stone</item>
+        <item>@color/imagina_contact_picture_light_brick</item>
+        <item>@color/imagina_contact_picture_light_clay</item>
+        <item>@color/imagina_contact_picture_light_ochre</item>
+        <item>@color/imagina_contact_picture_light_olive</item>
+        <item>@color/imagina_contact_picture_light_forest</item>
+        <item>@color/imagina_contact_picture_light_steel</item>
+        <item>@color/imagina_contact_picture_light_muted</item>
+        <item>@color/imagina_contact_picture_light_ink</item>
+    </integer-array>
+
+    <integer-array name="imagina_contact_picture_colors_dark">
+        <item>@color/imagina_contact_picture_dark_slate</item>
+        <item>@color/imagina_contact_picture_dark_stone</item>
+        <item>@color/imagina_contact_picture_dark_brick</item>
+        <item>@color/imagina_contact_picture_dark_clay</item>
+        <item>@color/imagina_contact_picture_dark_ochre</item>
+        <item>@color/imagina_contact_picture_dark_olive</item>
+        <item>@color/imagina_contact_picture_dark_forest</item>
+        <item>@color/imagina_contact_picture_dark_steel</item>
+        <item>@color/imagina_contact_picture_dark_muted</item>
+        <item>@color/imagina_contact_picture_dark_ink</item>
+    </integer-array>
 </resources>

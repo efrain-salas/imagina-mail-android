@@ -23,6 +23,15 @@
         <!-- Imagina's mark in the About screen and the launcher shortcut (Thunderbird's logo is the bird) -->
         <item name="appLogo">@drawable/ic_imagina_mark</item>
 
+        <!-- Instrument Sans in what Material's typefaces do not reach (imagina_typography.xml) -->
+        <item name="android:textAppearance">@style/TextAppearance.Imagina</item>
+        <item name="android:textAppearanceSmall">@style/TextAppearance.Imagina.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance.Imagina.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance.Imagina.Large</item>
+        <item name="android:textAppearanceListItem">@style/TextAppearance.Imagina.ListItem</item>
+        <item name="android:textAppearanceListItemSmall">@style/TextAppearance.Imagina.ListItem</item>
+        <item name="android:textAppearanceListItemSecondary">@style/TextAppearance.Imagina.ListItemSecondary</item>
+
         <!-- Legacy styles -->
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
 
@@ -39,8 +48,8 @@
         <item name="messageListSwipeSpamColor">@color/material_red_700</item>
         <item name="messageListSwipeMoveColor">@color/material_purple_500</item>
 
-        <item name="contactPictureFallbackDefaultBackgroundColor">#ffababab</item>
-        <item name="contactPictureFallbackBackgroundColors">@array/contact_picture_fallback_background_colors_light</item>
+        <item name="contactPictureFallbackDefaultBackgroundColor">@color/imagina_contact_picture_default</item>
+        <item name="contactPictureFallbackBackgroundColors">@array/imagina_contact_picture_colors_light</item>
         <item name="contactTokenBackgroundColor">#ccc</item>
         <item name="tintColorBulletPointPositive">#77aa22</item>
         <item name="tintColorBulletPointNegative">#dd2222</item>
@@ -64,6 +73,15 @@
         <!-- Imagina's mark in the About screen and the launcher shortcut (Thunderbird's logo is the bird) -->
         <item name="appLogo">@drawable/ic_imagina_mark</item>
 
+        <!-- Instrument Sans in what Material's typefaces do not reach (imagina_typography.xml) -->
+        <item name="android:textAppearance">@style/TextAppearance.Imagina</item>
+        <item name="android:textAppearanceSmall">@style/TextAppearance.Imagina.Small</item>
+        <item name="android:textAppearanceMedium">@style/TextAppearance.Imagina.Medium</item>
+        <item name="android:textAppearanceLarge">@style/TextAppearance.Imagina.Large</item>
+        <item name="android:textAppearanceListItem">@style/TextAppearance.Imagina.ListItem</item>
+        <item name="android:textAppearanceListItemSmall">@style/TextAppearance.Imagina.ListItem</item>
+        <item name="android:textAppearanceListItemSecondary">@style/TextAppearance.Imagina.ListItemSecondary</item>
+
         <!-- Legacy styles -->
         <item name="preferenceTheme">@style/PreferenceThemeOverlay</item>
 
@@ -81,8 +99,8 @@
         <item name="messageListSwipeMoveColor">@color/material_purple_600</item>
 
         <item name="contactTokenBackgroundColor">#313131</item>
-        <item name="contactPictureFallbackDefaultBackgroundColor">#ff606060</item>
-        <item name="contactPictureFallbackBackgroundColors">@array/contact_picture_fallback_background_colors_dark</item>
+        <item name="contactPictureFallbackDefaultBackgroundColor">@color/imagina_contact_picture_default</item>
+        <item name="contactPictureFallbackBackgroundColors">@array/imagina_contact_picture_colors_dark</item>
         <item name="tintColorBulletPointPositive">#77aa22</item>
         <item name="tintColorBulletPointNegative">#dd2222</item>
         <item name="tintColorBulletPointNeutral">#bbb</item>
@@ -99,7 +117,14 @@
     <style name="Theme.Thunderbird.Light.Dialog" parent="Theme.Thunderbird.Light" />
     <style name="Theme.Thunderbird.Dark.Dialog" parent="Theme.Thunderbird.Dark" />
 
-    <style name="Theme.Thunderbird.Light.Dialog.Translucent" parent="Theme.Material3.Light.Dialog">
+    <!--
+        The invisible window that shows a dialog (confirming a delete from a notification, choosing the OpenPGP app).
+        Thunderbird's inherit from Material 3 itself, so the dialog on it is painted with Material's own purple and
+        lavender instead of the colours of the app; these inherit from the app's themes, which have Imagina's, and keep
+        the window floating and see-through as before.
+    -->
+    <style name="Theme.Thunderbird.Light.Dialog.Translucent" parent="Theme.Thunderbird.Light">
+        <item name="android:windowIsFloating">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>
@@ -113,7 +138,8 @@
         <item name="tintColorBulletPointNeutral">#bbb</item>
     </style>
 
-    <style name="Theme.Thunderbird.Dark.Dialog.Translucent" parent="Theme.Material3.Dark.Dialog">
+    <style name="Theme.Thunderbird.Dark.Dialog.Translucent" parent="Theme.Thunderbird.Dark">
+        <item name="android:windowIsFloating">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowIsTranslucent">true</item>

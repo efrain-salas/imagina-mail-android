@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Imagina's typography for the screens of XML (IMAGINA.md, «Tipografía»): Instrument Sans for every text. Fraunces,
+    the typeface of the big headlines, is not here: only the Compose screens have headlines that big
+    (ImaginaTypography).
+
+    Material 3 takes the typeface of every text appearance (body, label, title, headline, display; so the message list,
+    the toolbars, the dialogs, the buttons, the fields) from four strings of its library, and a string of the app with
+    the same name replaces the one of the library, so these four are all it takes, without touching a file of
+    Thunderbird. Each points to a family of res/font, because a family gives the weight and a real bold:
+      plain regular   body text                                      -> imagina_sans (400, bold 700)
+      plain medium    buttons, tabs, labels, small titles            -> imagina_sans_medium (500, bold 700)
+      brand regular   titles of a toolbar or a dialog, big headlines -> imagina_sans_semibold (600, bold 700)
+      brand medium    the same, emphasised                           -> imagina_sans_semibold
+    ImaginaTypographyTest fails if one of them is lost.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Lint says a string alias must point to a string; here it points to a font on purpose: the string is what
+         Material's text appearances ask for as fontFamily, and the font of a family is what they get -->
+    <string
+        name="m3_ref_typeface_plain_regular"
+        translatable="false"
+        tools:ignore="ReferenceType"
+        >@font/imagina_sans</string>
+    <string
+        name="m3_ref_typeface_plain_medium"
+        translatable="false"
+        tools:ignore="ReferenceType"
+        >@font/imagina_sans_medium</string>
+    <string
+        name="m3_ref_typeface_brand_regular"
+        translatable="false"
+        tools:ignore="ReferenceType"
+        >@font/imagina_sans_semibold</string>
+    <string
+        name="m3_ref_typeface_brand_medium"
+        translatable="false"
+        tools:ignore="ReferenceType"
+        >@font/imagina_sans_semibold</string>
+
+    <!--
+        What Material does not reach: the text appearances of Android itself (the default of a text with none, the
+        small, medium and large ones that Thunderbird's layouts ask for, and the ones of a list item: the title and the
+        summary of a setting). Each is the one of the platform with the typeface changed, so sizes and colours stay;
+        themes.xml sets them in both themes. They do not touch a Material appearance, which keeps its own weight.
+    -->
+    <style name="TextAppearance.Imagina" parent="@android:style/TextAppearance.Material">
+        <item name="android:fontFamily">@font/imagina_sans</item>
+        <item name="fontFamily">@font/imagina_sans</item>
+    </style>
+
+    <style name="TextAppearance.Imagina.Small" parent="@android:style/TextAppearance.Material.Small">
+        <item name="android:fontFamily">@font/imagina_sans</item>
+        <item name="fontFamily">@font/imagina_sans</item>
+    </style>
+
+    <style name="TextAppearance.Imagina.Medium" parent="@android:style/TextAppearance.Material.Medium">
+        <item name="android:fontFamily">@font/imagina_sans</item>
+        <item name="fontFamily">@font/imagina_sans</item>
+    </style>
+
+    <style name="TextAppearance.Imagina.Large" parent="@android:style/TextAppearance.Material.Large">
+        <item name="android:fontFamily">@font/imagina_sans</item>
+        <item name="fontFamily">@font/imagina_sans</item>
+    </style>
+
+    <style name="TextAppearance.Imagina.ListItem" parent="@android:style/TextAppearance.Material.Subhead">
+        <item name="android:fontFamily">@font/imagina_sans</item>
+        <item name="fontFamily">@font/imagina_sans</item>
+    </style>
+
+    <style name="TextAppearance.Imagina.ListItemSecondary" parent="@android:style/TextAppearance.Material.Body1">
+        <item name="android:fontFamily">@font/imagina_sans</item>
+        <item name="fontFamily">@font/imagina_sans</item>
+    </style>
+</resources>

@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import net.thunderbird.android.R
 import net.thunderbird.components.ui.bolt.resources.Res
 import net.thunderbird.components.ui.bolt.resources.bolt_k9mail_logo
@@ -18,7 +19,6 @@ import net.thunderbird.components.ui.bolt.theme.default.defaultThemeElevations
 import net.thunderbird.components.ui.bolt.theme.default.defaultThemeShapes
 import net.thunderbird.components.ui.bolt.theme.default.defaultThemeSizes
 import net.thunderbird.components.ui.bolt.theme.default.defaultThemeSpacings
-import net.thunderbird.components.ui.bolt.theme.default.defaultTypography
 
 /**
  * Bolt, Thunderbird's theme for Compose screens, with Imagina's colours (IMAGINA.md, «Colores») instead of
@@ -28,16 +28,20 @@ import net.thunderbird.components.ui.bolt.theme.default.defaultTypography
  *
  * The colours are the resources `light*` and `dark*` of the app (`values/imagina_theme_colors.xml`), the
  * ones that also colour the screens of XML: one palette for both. The logos are the two that Bolt has, which the
- * app replaces with Imagina's mark and its inverse for the dark theme (`imagina/generate-resources.sh`).
+ * app replaces with Imagina's mark and its inverse for the dark theme (`imagina/generate-resources.sh`), and the
+ * wordmark «imagina /mail» (`ThemeImages.wordmark`, a hook of Bolt that is empty in Thunderbird), which the headers
+ * of the screens show in place of the logo and the name. The typography is Imagina's ([imaginaTypography]).
  */
 @Composable
 fun ImaginaBoltTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
-    // Not Thunderbird's and K-9 Mail's logos any more: the assets of the app with those names are Imagina's
-    val lightImages = ThemeImages(logo = Res.drawable.bolt_thunderbird_logo)
-    val darkImages = ThemeImages(logo = Res.drawable.bolt_k9mail_logo)
+    // Not Thunderbird's and K-9 Mail's logos any more: the assets of the app with those names are Imagina's. The
+    // wordmark is an Android drawable with its reverse in drawable-night, so one painter serves both themes
+    val wordmark = painterResource(R.drawable.ic_imagina_wordmark)
+    val lightImages = ThemeImages(logo = Res.drawable.bolt_thunderbird_logo, wordmark = wordmark)
+    val darkImages = ThemeImages(logo = Res.drawable.bolt_k9mail_logo, wordmark = wordmark)
 
     val themeConfig = ThemeConfig(
         colors = ThemeColorSchemeVariants(
@@ -52,7 +56,7 @@ fun ImaginaBoltTheme(
         sizes = defaultThemeSizes,
         spacings = defaultThemeSpacings,
         shapes = defaultThemeShapes,
-        typography = defaultTypography,
+        typography = imaginaTypography(),
     )
 
     BoltTheme(

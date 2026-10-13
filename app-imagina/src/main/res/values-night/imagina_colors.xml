@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The widget of the message list in the dark theme (see values/imagina_colors.xml): the dark surface (as the
+         toolbar of the app) and border of the design system, ivory ink and the dark ink-muted -->
+    <color name="message_list_widget_header_background">#1A1B25</color>
+    <color name="message_list_widget_header_text">#F3F2EE</color>
+    <color name="message_list_widget_divider">#2A2C3A</color>
+    <color name="message_list_widget_text_read">#A2A6B3</color>
+    <color name="message_list_widget_text_unread">#F3F2EE</color>
+</resources>

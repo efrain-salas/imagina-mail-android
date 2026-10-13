@@ -28,6 +28,19 @@ internal object ImaginaProjectFiles {
     /** The `<bool name="..">value</bool>` entries of a resource file, in order. */
     fun bools(file: File): Map<String, String> = resourceEntries(file, "bool")
 
+    /** The `<item name="..">value</item>` entries of a `<style>` or `<integer-array>` of a resource file, in order. */
+    fun items(file: File, tag: String, name: String): List<Pair<String, String>> {
+        val parents = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file).getElementsByTagName(tag)
+        val parent = (0 until parents.length).map { parents.item(it) as Element }.firstOrNull {
+            it.getAttribute("name") == name
+        } ?: error("$name is not a $tag of ${file.name}")
+        val items = parent.getElementsByTagName("item")
+        return (0 until items.length).map {
+            val item = items.item(it) as Element
+            item.getAttribute("name") to item.textContent.trim()
+        }
+    }
+
     private fun resourceEntries(file: File, tag: String): Map<String, String> {
         val elements = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file).getElementsByTagName(tag)
         return buildMap {

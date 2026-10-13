@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -274,11 +275,21 @@ fun AppLogo(
             .padding(all = BoltTheme.spacings.double),
         horizontalArrangement = Arrangement.Center,
     ) {
-        Image(
-            painter = painterResource(id = logoResId),
-            modifier = Modifier.size(size = 100.dp),
-            contentDescription = null,
-        )
+        // Imagina (IMAGINA.md): the logotype of the app where the theme has one. The title below says the name
+        val wordmark = BoltTheme.images.wordmark
+        if (wordmark != null) {
+            Image(
+                painter = wordmark,
+                modifier = Modifier.height(height = 40.dp),
+                contentDescription = null,
+            )
+        } else {
+            Image(
+                painter = painterResource(id = logoResId),
+                modifier = Modifier.size(size = 100.dp),
+                contentDescription = null,
+            )
+        }
     }
 }
 

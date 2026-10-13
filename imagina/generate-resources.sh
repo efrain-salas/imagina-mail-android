@@ -24,6 +24,16 @@ $TOOL $MARK "$OUT/ic_imagina_mark.xml" --width 64 --height 64
 mkdir -p "$RES/drawable-night"
 $TOOL $INVERSE "$RES/drawable-night/ic_imagina_mark.xml" --width 64 --height 64
 
+# The wordmark «imagina /mail» (traced, never live text) for every place that has room for the product's name: the
+# «Entrar con Imagina» screen, the header of the permissions step and the About screen. It is the brand's logo; the mark
+# above stays for where only an icon fits. 40 dp high is the largest size the app draws it at (the screens scale it
+# down); 577.5 x 98 is the ratio of the SVG. On dark backgrounds the brand uses the reverse (ivory ink, brighter teal),
+# which Android picks from drawable-night.
+WORDMARK=imagina/brand/imagina-mail-wordmark.svg
+WORDMARK_REVERSE=imagina/brand/imagina-mail-wordmark-reverse.svg
+$TOOL $WORDMARK "$OUT/ic_imagina_wordmark.xml" --width 235.71 --height 40
+$TOOL $WORDMARK_REVERSE "$RES/drawable-night/ic_imagina_wordmark.xml" --width 235.71 --height 40
+
 # Small icon of the notifications that Thunderbird draws with its logo (the service notification of «Comprobando tu
 # correo…», the push one): a one-colour glyph, the envelope with the dot. TbAppIconNotificationProvider uses it.
 $TOOL imagina/brand/imagina-mail-notification.svg "$OUT/ic_imagina_notification.xml" --width 24 --height 24
