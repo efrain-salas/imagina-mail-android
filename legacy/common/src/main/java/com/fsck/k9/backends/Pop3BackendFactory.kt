@@ -5,6 +5,7 @@ import com.fsck.k9.backend.pop3.Pop3Backend
 import com.fsck.k9.mail.oauth.OAuth2TokenProvider
 import com.fsck.k9.mail.ssl.TrustedSocketFactory
 import com.fsck.k9.mail.store.pop3.Pop3Store
+import com.fsck.k9.mail.transport.smtp.SMTP_HELLO_NAME
 import com.fsck.k9.mail.transport.smtp.SmtpTransport
 import net.thunderbird.backend.api.BackendFactory
 import net.thunderbird.backend.api.BackendStorageFactory
@@ -18,6 +19,7 @@ class DefaultPop3BackendFactory(
     private val accountManager: LegacyAccountManager,
     private val backendStorageFactory: BackendStorageFactory,
     private val trustedSocketFactory: TrustedSocketFactory,
+    private val smtpHelloName: String = SMTP_HELLO_NAME,
 ) : Pop3BackendFactory {
 
     override fun createBackend(accountId: AccountId): Backend {
@@ -39,6 +41,6 @@ class DefaultPop3BackendFactory(
     private fun createSmtpTransport(account: LegacyAccount): SmtpTransport {
         val serverSettings = account.outgoingServerSettings
         val oauth2TokenProvider: OAuth2TokenProvider? = null
-        return SmtpTransport(serverSettings, trustedSocketFactory, oauth2TokenProvider)
+        return SmtpTransport(serverSettings, trustedSocketFactory, oauth2TokenProvider, smtpHelloName)
     }
 }

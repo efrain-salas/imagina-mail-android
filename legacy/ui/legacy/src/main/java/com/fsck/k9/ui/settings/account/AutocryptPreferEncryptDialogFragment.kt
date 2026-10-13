@@ -20,7 +20,14 @@ class AutocryptPreferEncryptDialogFragment : PreferenceDialogFragmentCompat() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = layoutInflater.inflate(R.layout.dialog_autocrypt_prefer_encrypt, null)
 
-        view.findViewById<MaterialTextView>(R.id.prefer_encrypt_learn_more).makeLinksClickable()
+        view.findViewById<MaterialTextView>(R.id.prefer_encrypt_learn_more).apply {
+            // Imagina (IMAGINA.md): the link goes to K-9 Mail's blog, which a white-label app does not show
+            if (context.resources.getBoolean(R.bool.autocrypt_learn_more_available)) {
+                makeLinksClickable()
+            } else {
+                visibility = View.GONE
+            }
+        }
 
         preferEncryptCheckbox = view.findViewById<MaterialCheckBox>(R.id.prefer_encrypt_check).apply {
             isChecked = preferEncryptPreference.isPreferEncryptEnabled

@@ -5,8 +5,10 @@ import com.fsck.k9.backend.imap.BackendIdleRefreshManager
 import com.fsck.k9.backend.imap.SystemAlarmManager
 import com.fsck.k9.mail.oauth.OAuth2TokenProviderFactory
 import com.fsck.k9.mail.store.imap.IdleRefreshManager
+import com.fsck.k9.mail.transport.smtp.SMTP_HELLO_NAME
 import net.thunderbird.backend.api.BackendFactory
 import org.koin.core.qualifier.named
+import org.koin.core.scope.Scope
 import org.koin.dsl.module
 
 val backendsModule = module {
@@ -30,6 +32,7 @@ val backendsModule = module {
             context = get(),
             clientInfoAppName = get(named("ClientInfoAppName")),
             clientInfoAppVersion = get(named("ClientInfoAppVersion")),
+            smtpHelloName = smtpHelloName(),
         )
     }
     single<SystemAlarmManager> { AndroidAlarmManager(context = get(), alarmManager = get()) }
@@ -39,7 +42,14 @@ val backendsModule = module {
             accountManager = get(),
             backendStorageFactory = get(),
             trustedSocketFactory = get(),
+            smtpHelloName = smtpHelloName(),
         )
     }
     single<OAuth2TokenProviderFactory> { RealOAuth2TokenProviderFactory(context = get()) }
 }
+
+/**
+ * The name the app presents itself with to SMTP servers. Imagina Mail (IMAGINA.md) declares a string named
+ * `SmtpHelloName`; Thunderbird and K-9 Mail do not and keep [SMTP_HELLO_NAME].
+ */
+private fun Scope.smtpHelloName(): String = getOrNull(named("SmtpHelloName")) ?: SMTP_HELLO_NAME

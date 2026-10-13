@@ -125,6 +125,13 @@ class AboutFragment : Fragment() {
                                 ),
                             )
                         },
+                        displayPrivacyPolicy = {
+                            dispatch(
+                                Event.OnSectionContentClick(
+                                    getString(R.string.app_privacy_url),
+                                ),
+                            )
+                        },
                     )
                 }
             }
@@ -199,6 +206,7 @@ fun AboutScreen(
     displayLicense: () -> Unit = {},
     displayWebSite: () -> Unit = {},
     displaySource: () -> Unit = {},
+    displayPrivacyPolicy: () -> Unit = {},
 ) {
     val scrollState = rememberScrollState()
     Surface(
@@ -252,6 +260,8 @@ fun AboutScreen(
                 onClick = displayWebSite,
             )
 
+            PrivacyPolicyContent(onClick = displayPrivacyPolicy)
+
             // Imagina (IMAGINA.md): the source code in place of the user forum, which Imagina's version does not have
             SectionContent(
                 sectionLabel = stringResource(R.string.source_code),
@@ -263,6 +273,23 @@ fun AboutScreen(
             SectionTitle(title = librariesTitle)
             LibraryList(libraries = libraries)
         }
+    }
+}
+
+/**
+ * Imagina (IMAGINA.md): the privacy policy of a white-label app. Its address is empty in Thunderbird, which shows no
+ * row for it.
+ */
+@Composable
+private fun PrivacyPolicyContent(onClick: () -> Unit) {
+    val privacyUrl = stringResource(R.string.app_privacy_url)
+    if (privacyUrl.isNotBlank()) {
+        SectionContent(
+            sectionLabel = stringResource(R.string.about_privacy_policy),
+            sectionText = privacyUrl,
+            sectionImageId = DesignSystemR.drawable.ic_link,
+            onClick = onClick,
+        )
     }
 }
 

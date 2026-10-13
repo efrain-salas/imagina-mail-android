@@ -11,6 +11,7 @@ import com.fsck.k9.mail.store.imap.IdleRefreshManager
 import com.fsck.k9.mail.store.imap.ImapClientInfo
 import com.fsck.k9.mail.store.imap.ImapStore
 import com.fsck.k9.mail.store.imap.ImapStoreConfig
+import com.fsck.k9.mail.transport.smtp.SMTP_HELLO_NAME
 import com.fsck.k9.mail.transport.smtp.SmtpTransport
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -35,6 +36,7 @@ class DefaultImapBackendFactory(
     private val context: Context,
     private val clientInfoAppName: String,
     private val clientInfoAppVersion: String,
+    private val smtpHelloName: String = SMTP_HELLO_NAME,
 ) : ImapBackendFactory {
     override fun createBackend(accountId: AccountId): Backend {
         val account = accountManager.getAccount(accountId.toString()) ?: error("Account not found: $accountId")
@@ -95,7 +97,7 @@ class DefaultImapBackendFactory(
             null
         }
 
-        return SmtpTransport(serverSettings, trustedSocketFactory, oauth2TokenProvider)
+        return SmtpTransport(serverSettings, trustedSocketFactory, oauth2TokenProvider, smtpHelloName)
     }
 
     private fun createOAuth2TokenProvider(accountId: AccountId): RealOAuth2TokenProvider {

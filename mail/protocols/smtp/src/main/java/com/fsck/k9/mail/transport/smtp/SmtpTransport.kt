@@ -53,6 +53,8 @@ class SmtpTransport(
     serverSettings: ServerSettings,
     private val trustedSocketFactory: TrustedSocketFactory,
     private val oauthTokenProvider: OAuth2TokenProvider?,
+    // Imagina (IMAGINA.md): the name a white-label app presents itself with; Thunderbird and K-9 Mail keep the default
+    private val helloName: String = SMTP_HELLO_NAME,
 ) {
     private val host = serverSettings.host
     private val port = serverSettings.port
@@ -104,7 +106,7 @@ class SmtpTransport(
 
             readGreeting()
 
-            var extensions = sendHello(SMTP_HELLO_NAME)
+            var extensions = sendHello(helloName)
 
             is8bitEncodingAllowed = extensions.containsKey("8BITMIME")
             areUnicodeAddressesAllowed = extensions.containsKey("SMTPUTF8")
@@ -127,7 +129,7 @@ class SmtpTransport(
                     outputStream = BufferedOutputStream(tlsSocket.getOutputStream(), 1024)
 
                     // Now resend the EHLO. Required by RFC2487 Sec. 5.2, and more specifically, Exim.
-                    extensions = sendHello(SMTP_HELLO_NAME)
+                    extensions = sendHello(helloName)
                     secureConnection = true
                 } else {
                     throw MissingCapabilityException("STARTTLS")

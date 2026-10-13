@@ -1,5 +1,10 @@
 package net.thunderbird.android.imagina
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -17,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -76,6 +82,9 @@ private fun ImaginaSignInContent(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val privacyUrl = stringResource(R.string.app_privacy_url)
+
     Scaffold(modifier = modifier) { paddingValues ->
         Column(
             modifier = Modifier
@@ -125,12 +134,25 @@ private fun ImaginaSignInContent(
                 if (mode == ImaginaSignInMode.Reconnect) {
                     ButtonText(text = stringResource(R.string.imagina_reconnect_dismiss), onClick = onDismiss)
                 }
+                // Google Play asks for the privacy policy inside the app too, before any data is entered
+                ButtonText(
+                    text = stringResource(R.string.about_privacy_policy),
+                    onClick = { context.openInBrowser(privacyUrl) },
+                )
             }
         }
     }
 }
 
 private const val WORDMARK_HEIGHT_DP = 40
+
+private fun Context.openInBrowser(url: String) {
+    try {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    } catch (ignored: ActivityNotFoundException) {
+        Toast.makeText(this, R.string.imagina_error_browser_not_available, Toast.LENGTH_SHORT).show()
+    }
+}
 
 private fun ImaginaSignInViewModel.Reason.messageResource(): Int = when (this) {
     ImaginaSignInViewModel.Reason.BrowserNotAvailable -> R.string.imagina_error_browser_not_available

@@ -3,10 +3,12 @@ package net.thunderbird.android.imagina
 import app.k9mail.feature.account.edit.navigation.AccountEditNavigation
 import app.k9mail.feature.account.setup.navigation.AccountSetupNavigation
 import app.k9mail.feature.onboarding.main.navigation.OnboardingNavigation
+import net.thunderbird.android.BuildConfig
 import net.thunderbird.feature.thundermail.navigation.ThundermailNavigation
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 /**
@@ -19,6 +21,10 @@ val imaginaModule = module {
     single<AccountEditNavigation> { ImaginaAccountEditNavigation() }
     single<AccountSetupNavigation> { ImaginaAccountSetupNavigation() }
     single<ThundermailNavigation> { ImaginaNavigation() }
+
+    // The name the SMTP client presents itself with in EHLO/HELO, which ends up in the headers of every message sent:
+    // a name that resolves instead of Thunderbird's ehlo.thunderbird.net (the backend factories read it, IMAGINA.md)
+    single(named("SmtpHelloName")) { BuildConfig.IMAGINA_SMTP_HELLO_NAME }
 
     // Link with Imagina's devices API
     single<ImaginaDeviceStore> { SharedPreferencesImaginaDeviceStore(context = androidContext()) }

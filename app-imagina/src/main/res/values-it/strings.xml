@@ -18,4 +18,5 @@
     <string name="imagina_checking_mail">Controllo della tua posta…</string>
     <string name="signature_managed_notice">La tua firma è gestita da Imagina: modificala in «Il mio account».</string>
     <string name="about_notice">Imagina Mail è una versione di Thunderbird per Android modificata da Imagina. Non è l’app ufficiale di Thunderbird e né Mozilla né MZLA Technologies la sostengono o la supportano. È software libero con licenza Apache 2.0 e il suo codice sorgente è disponibile qui sotto.</string>
+    <string name="about_privacy_policy">Informativa sulla privacy</string>
 </resources>

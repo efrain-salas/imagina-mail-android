@@ -576,6 +576,37 @@ class SmtpTransportTest {
     }
 
     @Test
+    fun `open() should use the hello name it is given, before and after STARTTLS`() {
+        val helloName = "mail.example.org"
+        val server = MockSmtpServer().apply {
+            output("220 localhost Simple Mail Transfer Service Ready")
+            expect("EHLO $helloName")
+            output("250-localhost Hello $helloName")
+            output("250-STARTTLS")
+            output("250 HELP")
+            expect("STARTTLS")
+            output("220 Ready to start TLS")
+            startTls()
+            expect("EHLO $helloName")
+            output("250-localhost Hello $helloName")
+            output("250 AUTH PLAIN LOGIN")
+            expect("AUTH PLAIN AHVzZXIAcGFzc3dvcmQ=")
+            output("235 2.7.0 Authentication successful")
+        }
+        val transport = startServerAndCreateSmtpTransport(
+            server,
+            authenticationType = AuthType.PLAIN,
+            connectionSecurity = ConnectionSecurity.STARTTLS_REQUIRED,
+            helloName = helloName,
+        )
+
+        transport.open()
+
+        server.verifyConnectionStillOpen()
+        server.verifyInteractionCompleted()
+    }
+
+    @Test
     fun `open() with STARTTLS but without STARTTLS capability should throw`() {
         val server = MockSmtpServer().apply {
             output("220 localhost Simple Mail Transfer Service Ready")
@@ -957,6 +988,7 @@ class SmtpTransportTest {
         authenticationType: AuthType = AuthType.PLAIN,
         connectionSecurity: ConnectionSecurity = ConnectionSecurity.NONE,
         password: String? = PASSWORD,
+        helloName: String = SMTP_HELLO_NAME,
     ): SmtpTransport {
         server.start()
         val host = server.host
@@ -972,7 +1004,7 @@ class SmtpTransportTest {
             CLIENT_CERTIFICATE_ALIAS,
         )
 
-        return SmtpTransport(serverSettings, socketFactory, oAuth2TokenProvider)
+        return SmtpTransport(serverSettings, socketFactory, oAuth2TokenProvider, helloName)
     }
 
     private fun createDefaultMessageBuilder(): TestMessageBuilder {
