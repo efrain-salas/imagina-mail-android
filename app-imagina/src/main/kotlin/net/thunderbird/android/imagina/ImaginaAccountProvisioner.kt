@@ -32,6 +32,12 @@ interface ImaginaLocalAccounts {
     /** Gives the account [name] when it has one of the names in [replacing] or none: a name the person chose stays. */
     fun rename(accountUuid: String, name: String, replacing: Set<String>)
 
+    /**
+     * Puts [signature], the plain text Imagina gives the mailbox (lines separated by `\n`), as the account's
+     * signature: used when it is not blank, never HTML. An empty one leaves the account without signature.
+     */
+    fun setSignature(accountUuid: String, signature: String)
+
     /** Removes the account and its messages in the background. */
     fun remove(accountUuid: String)
 
@@ -114,6 +120,18 @@ class ImaginaAccountProvisioner(
 
         if (current != name && (current.isNullOrBlank() || current in replacing)) {
             account.name = name
+            preferences.saveAccount(account)
+        }
+    }
+
+    override fun setSignature(accountUuid: String, signature: String) {
+        val account = preferences.getAccount(accountUuid) ?: return
+        val use = signature.isNotBlank()
+
+        if (account.signature.orEmpty() != signature || account.signatureUse != use || account.signatureIsHtml) {
+            account.signature = signature
+            account.signatureUse = use
+            account.signatureIsHtml = false
             preferences.saveAccount(account)
         }
     }

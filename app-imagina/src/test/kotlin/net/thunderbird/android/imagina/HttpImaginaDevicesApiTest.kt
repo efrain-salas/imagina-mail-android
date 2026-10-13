@@ -4,6 +4,7 @@ import assertk.all
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.containsExactly
+import assertk.assertions.doesNotContain
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
@@ -160,6 +161,97 @@ class HttpImaginaDevicesApiTest {
         assertThat(refresh.removed).containsExactly("old@casapepe.com")
         assertThat(requests.single().method).isEqualTo("POST")
         assertThat(requests.single().path).isEqualTo("/api/v1/cloud/devices/d/refresh")
+    }
+
+    @Test
+    fun `registerDevice reads the signature of each mailbox, empty or absent`() = runTest {
+        status = 201
+        response = """
+            {
+              "device": {"id": "0199-aaaa"},
+              "mailboxes": [
+                {"address": "ana@casapepe.com", "name": "Ana", "company": "Casa Pepe",
+                 "username": "ana.android@casapepe.com", "password": "p",
+                 "imap": {"host": "imap.migadu.com", "port": 993, "security": "ssl"},
+                 "smtp": {"host": "smtp.migadu.com", "port": 465, "security": "ssl"},
+                 "signature": "Ana Pérez\nCasa Pepe\n+34 600 000 000"},
+                {"address": "info@casapepe.com", "name": "Info", "company": "Casa Pepe",
+                 "username": "info.android@casapepe.com", "password": "p",
+                 "imap": {"host": "imap.migadu.com", "port": 993, "security": "ssl"},
+                 "smtp": {"host": "smtp.migadu.com", "port": 465, "security": "ssl"},
+                 "signature": ""},
+                {"address": "old@casapepe.com", "name": "Old", "company": "Casa Pepe",
+                 "username": "old.android@casapepe.com", "password": "p",
+                 "imap": {"host": "imap.migadu.com", "port": 993, "security": "ssl"},
+                 "smtp": {"host": "smtp.migadu.com", "port": 465, "security": "ssl"}}
+              ]
+            }
+        """.trimIndent()
+
+        val registration = api.registerDevice(accessToken = "token", name = "Pixel")
+
+        assertThat(registration.mailboxes.map { it.signature }).containsExactly(
+            "Ana Pérez\nCasa Pepe\n+34 600 000 000",
+            "",
+            null,
+        )
+    }
+
+    @Test
+    fun `a mailbox is never printed with its password nor its signature`() {
+        val text = mailbox("ana@casapepe.com", password = "p4ss").copy(signature = "Ana Pérez").toString()
+
+        assertThat(text).doesNotContain("p4ss")
+        assertThat(text).doesNotContain("Ana Pérez")
+    }
+
+    @Test
+    fun `getDevice reads the signature of the mailboxes that have one, empty or absent`() = runTest {
+        response = """
+            {"device": {"id": "d"}, "revoked": false, "changed": false,
+             "mailboxes": [{"address": "ana@casapepe.com", "company": "Casa Pepe", "state": "current",
+                            "signature": "Ana Pérez\nCasa Pepe"},
+                           {"address": "info@casapepe.com", "company": "Casa Pepe", "state": "added",
+                            "signature": ""},
+                           {"address": "old@casapepe.com", "company": "Casa Pepe", "state": "removed"}]}
+        """.trimIndent()
+
+        val device = api.getDevice(accessToken = "token", deviceId = "d")
+
+        assertThat(device.mailboxes.map { it.address to it.signature }).containsExactly(
+            "ana@casapepe.com" to "Ana Pérez\nCasa Pepe",
+            "info@casapepe.com" to "",
+            "old@casapepe.com" to null,
+        )
+    }
+
+    @Test
+    fun `a signature that is not text counts as absent`() = runTest {
+        response = """
+            {"revoked": false, "changed": false,
+             "mailboxes": [{"address": "ana@casapepe.com", "state": "current", "signature": null},
+                           {"address": "info@casapepe.com", "state": "current", "signature": 42}]}
+        """.trimIndent()
+
+        val device = api.getDevice(accessToken = "token", deviceId = "d")
+
+        assertThat(device.mailboxes.map { it.signature }).containsExactly(null, null)
+    }
+
+    @Test
+    fun `refreshDevice reads the signature of the added mailboxes`() = runTest {
+        response = """
+            {"added": [{"address": "info@casapepe.com", "name": "Info", "company": "Casa Pepe",
+                        "username": "info.android@casapepe.com", "password": "p",
+                        "imap": {"host": "imap.migadu.com", "port": 993, "security": "ssl"},
+                        "smtp": {"host": "smtp.migadu.com", "port": 465, "security": "ssl"},
+                        "signature": "Info\nCasa Pepe"}],
+             "removed": []}
+        """.trimIndent()
+
+        val refresh = api.refreshDevice(accessToken = "token", deviceId = "d")
+
+        assertThat(refresh.added.single().signature).isEqualTo("Info\nCasa Pepe")
     }
 
     @Test

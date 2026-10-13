@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,7 +19,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.booleanResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -28,6 +31,7 @@ import com.fsck.k9.activity.setup.AccountSetupCompositionContract.Event
 import com.fsck.k9.ui.R
 import com.fsck.k9.view.MessageWebView
 import kotlinx.coroutines.delay
+import net.thunderbird.components.ui.bolt.atom.Checkbox
 import net.thunderbird.components.ui.bolt.atom.DividerHorizontal
 import net.thunderbird.components.ui.bolt.atom.RadioGroup
 import net.thunderbird.components.ui.bolt.atom.button.ButtonText
@@ -35,30 +39,44 @@ import net.thunderbird.components.ui.bolt.atom.text.TextBodyLarge
 import net.thunderbird.components.ui.bolt.atom.text.TextLabelSmall
 import net.thunderbird.components.ui.bolt.atom.textfield.TextFieldOutlined
 import net.thunderbird.components.ui.bolt.molecule.input.CheckboxInput
+import net.thunderbird.components.ui.bolt.molecule.input.InputLayout
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
 import net.thunderbird.core.android.webkit.WebViewConfig
 import net.thunderbird.feature.mail.message.composer.signature.configureForSignaturePreview
 
+@Suppress("LongMethod")
 @Composable
 internal fun SignatureContent(
     state: AccountSetupCompositionContract.State,
     onEvent: (Event) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Imagina (IMAGINA.md): a white-label app whose signature is managed elsewhere makes it read only and says so
+    val isEditable = booleanResource(id = R.bool.signature_editable)
+    val managedNotice = stringResource(R.string.signature_managed_notice)
+
     Column(
         verticalArrangement = Arrangement.spacedBy(BoltTheme.spacings.default),
         modifier = modifier,
     ) {
-        CheckboxInput(
+        if (managedNotice.isNotEmpty()) {
+            TextLabelSmall(
+                text = managedNotice,
+                modifier = Modifier.padding(horizontal = BoltTheme.spacings.double),
+            )
+        }
+        SignatureCheckbox(
             text = stringResource(R.string.account_settings_signature_use_label),
             checked = state.useSignature,
+            isEnabled = isEditable,
             onCheckedChange = { onEvent(Event.UseSignatureChange(it)) },
         )
 
         if (state.useSignature) {
-            CheckboxInput(
+            SignatureCheckbox(
                 text = stringResource(R.string.account_settings_signature_is_html_label),
                 checked = state.saveSignatureAsHtml,
+                isEnabled = isEditable,
                 onCheckedChange = { onEvent(Event.OnFormatSignatureAsHtmlCheck(it)) },
             )
             TextLabelSmall(
@@ -77,12 +95,13 @@ internal fun SignatureContent(
                 ),
                 value = state.signature,
                 onValueChange = { onEvent(Event.SignatureChange(it)) },
+                isReadOnly = !isEditable,
                 modifier = Modifier
                     .padding(horizontal = BoltTheme.spacings.double)
                     .fillMaxWidth(),
             )
             AnimatedVisibility(
-                visible = state.signature.isNotBlank(),
+                visible = isEditable && state.signature.isNotBlank(),
                 enter = fadeIn(),
                 exit = fadeOut(),
                 modifier = Modifier
@@ -103,6 +122,30 @@ internal fun SignatureContent(
             )
 
             SignatureLocation(state, onEvent)
+        }
+    }
+}
+
+/** [CheckboxInput], which can't be disabled: without [isEnabled] it shows the value and ignores touches. */
+@Composable
+private fun SignatureCheckbox(
+    text: String,
+    checked: Boolean,
+    isEnabled: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    if (isEnabled) {
+        CheckboxInput(text = text, checked = checked, onCheckedChange = onCheckedChange)
+    } else {
+        InputLayout {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(BoltTheme.spacings.half),
+            ) {
+                Checkbox(checked = checked, onCheckedChange = null, enabled = false)
+                TextBodyLarge(text = text, modifier = Modifier.alpha(DISABLED_TEXT_ALPHA))
+            }
         }
     }
 }
@@ -221,3 +264,5 @@ internal class SignaturePreviewLoadState {
         return true
     }
 }
+
+private const val DISABLED_TEXT_ALPHA = 0.38f

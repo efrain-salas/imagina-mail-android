@@ -15,4 +15,8 @@
          sender for its identities), so no «Manage identities» and the sender address of the composition defaults
          is read only (IMAGINA.md, «Cambios en ficheros de Thunderbird») -->
     <bool name="sender_addresses_editable">false</bool>
+    <!-- The signature of each mailbox is Imagina's: it comes with the mailbox from the devices API and the person
+         changes it in «Mi cuenta», so in the composition defaults it is read only, with a note that says so
+         (signature_managed_notice, in strings.xml; IMAGINA.md, «Cambios en ficheros de Thunderbird») -->
+    <bool name="signature_editable">false</bool>
 </resources>

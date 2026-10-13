@@ -13,4 +13,11 @@
          address in the composition defaults. A white-label app whose mailboxes only send as themselves (Imagina Mail)
          turns it off -->
     <bool name="sender_addresses_editable">true</bool>
+    <!-- Whether a person may write the signature of an account in the composition defaults. A white-label app whose
+         signature comes from a server (Imagina Mail) turns it off: the «Use signature» and «HTML» checkboxes and the
+         text are read only -->
+    <bool name="signature_editable">true</bool>
+    <!-- A note above the signature in the composition defaults: empty here, a white-label app says where its
+         signature is managed -->
+    <string name="signature_managed_notice" translatable="false"></string>
 </resources>

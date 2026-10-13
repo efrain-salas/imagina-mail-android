@@ -288,6 +288,144 @@ class ImaginaDeviceSynchronizerTest {
     }
 
     @Test
+    fun `connect gives each new account the signature of its mailbox`() = runTest {
+        registers(
+            mailbox("ana@casapepe.com", signature = "Ana Pérez\nCasa Pepe"),
+            mailbox("info@casapepe.com", signature = ""),
+            mailbox("old@casapepe.com"),
+        )
+
+        synchronizer().connect(authorizationState, DEVICE_NAME)
+
+        assertThat(localAccounts.signatures).containsOnly(
+            localAccounts.uuidOf("ana@casapepe.com") to "Ana Pérez\nCasa Pepe",
+            localAccounts.uuidOf("info@casapepe.com") to "",
+        )
+    }
+
+    @Test
+    fun `connect with a device that is still valid applies the signatures of the status`() = runTest {
+        connected(mailbox("ana@casapepe.com"))
+        api.statusResult = { status(mailboxes = listOf(mailboxStatus("ana@casapepe.com", signature = "Ana"))) }
+
+        synchronizer().connect(authorizationState, DEVICE_NAME)
+
+        assertThat(localAccounts.signatures)
+            .containsOnly(localAccounts.uuidOf("ana@casapepe.com") to "Ana")
+    }
+
+    @Test
+    fun `connect is not undone by a signature that cannot be saved`() = runTest {
+        localAccounts.failOnSignature = setOf("account-1")
+        registers(mailbox("ana@casapepe.com", signature = "Ana"), mailbox("info@casapepe.com", signature = "Info"))
+
+        synchronizer().connect(authorizationState, DEVICE_NAME)
+
+        assertThat(store.accounts.map { it.address }).containsExactly("ana@casapepe.com", "info@casapepe.com")
+        assertThat(localAccounts.signatures).containsOnly(localAccounts.uuidOf("info@casapepe.com") to "Info")
+        assertThat(api.disconnected).isEmpty()
+    }
+
+    @Test
+    fun `sync gives the accounts the new signature of their mailboxes`() = runTest {
+        connected(mailbox("ana@casapepe.com", signature = "Ana"), mailbox("info@casapepe.com", signature = "Info"))
+        api.statusResult = {
+            status(
+                mailboxes = listOf(
+                    mailboxStatus("ANA@casapepe.com", signature = "Ana Pérez\nCasa Pepe"),
+                    mailboxStatus("info@casapepe.com", signature = "Info"),
+                ),
+            )
+        }
+
+        assertThat(synchronizer().sync()).isEqualTo(ImaginaSyncResult.Synced)
+
+        assertThat(localAccounts.signatures).containsOnly(
+            localAccounts.uuidOf("ana@casapepe.com") to "Ana Pérez\nCasa Pepe",
+            localAccounts.uuidOf("info@casapepe.com") to "Info",
+        )
+    }
+
+    @Test
+    fun `sync clears the signature when Imagina says there is none`() = runTest {
+        connected(mailbox("ana@casapepe.com", signature = "Ana"))
+        api.statusResult = { status(mailboxes = listOf(mailboxStatus("ana@casapepe.com", signature = ""))) }
+
+        synchronizer().sync()
+
+        assertThat(localAccounts.signatures).containsOnly(localAccounts.uuidOf("ana@casapepe.com") to "")
+    }
+
+    @Test
+    fun `sync leaves the signature alone when Imagina does not mention it`() = runTest {
+        connected(mailbox("ana@casapepe.com", signature = "Ana"), mailbox("info@casapepe.com"))
+        api.statusResult = {
+            status(
+                mailboxes = listOf(
+                    mailboxStatus("ana@casapepe.com", signature = null),
+                    mailboxStatus("info@casapepe.com", signature = null),
+                ),
+            )
+        }
+
+        assertThat(synchronizer().sync()).isEqualTo(ImaginaSyncResult.Synced)
+
+        assertThat(localAccounts.signatures).containsOnly(localAccounts.uuidOf("ana@casapepe.com") to "Ana")
+    }
+
+    @Test
+    fun `sync gives the account of an added mailbox its signature`() = runTest {
+        connected(mailbox("ana@casapepe.com"))
+        api.statusResult = {
+            status(changed = true, mailboxes = listOf(mailboxStatus("info@casapepe.com", "Info", state = "added")))
+        }
+        api.refreshResult = {
+            val added = listOf(mailbox("info@casapepe.com", signature = "Info"))
+            ImaginaDeviceRefresh(added = added, removed = emptyList())
+        }
+
+        synchronizer().sync()
+
+        assertThat(localAccounts.signatures).containsOnly(localAccounts.uuidOf("info@casapepe.com") to "Info")
+    }
+
+    @Test
+    fun `sync ignores the signature of a mailbox without account and of a removed one`() = runTest {
+        connected(mailbox("ana@casapepe.com", signature = "Ana"))
+        api.statusResult = {
+            status(
+                mailboxes = listOf(
+                    mailboxStatus("unknown@casapepe.com", signature = "Unknown"),
+                    mailboxStatus("ana@casapepe.com", signature = "Gone", state = "removed"),
+                ),
+            )
+        }
+
+        assertThat(synchronizer().sync()).isEqualTo(ImaginaSyncResult.Synced)
+
+        assertThat(localAccounts.signatures).containsOnly(localAccounts.uuidOf("ana@casapepe.com") to "Ana")
+    }
+
+    @Test
+    fun `sync goes on when the signature of one account cannot be saved`() = runTest {
+        connected(mailbox("ana@casapepe.com"), mailbox("info@casapepe.com"))
+        localAccounts.failOnSignature = setOf(localAccounts.uuidOf("ana@casapepe.com"))
+        api.statusResult = {
+            status(
+                mailboxes = listOf(
+                    mailboxStatus("ana@casapepe.com", signature = "Ana"),
+                    mailboxStatus("info@casapepe.com", signature = "Info"),
+                ),
+            )
+        }
+
+        assertThat(synchronizer().sync()).isEqualTo(ImaginaSyncResult.Synced)
+
+        assertThat(localAccounts.signatures).containsOnly(localAccounts.uuidOf("info@casapepe.com") to "Info")
+        assertThat(store.lastSyncAt).isEqualTo(NOW)
+    }
+
+    @Test
     fun `sync removes the accounts and the link when the device was revoked`() = runTest {
         connected(mailbox("ana@casapepe.com"), mailbox("info@casapepe.com"))
         api.statusResult = { status(revoked = true) }

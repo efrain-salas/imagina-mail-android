@@ -6,6 +6,7 @@ internal fun mailbox(
     address: String,
     company: String = "Casa Pepe",
     password: String = "secret-$address",
+    signature: String? = null,
 ) = ImaginaMailAccount(
     address = address,
     name = "Ana",
@@ -14,12 +15,21 @@ internal fun mailbox(
     password = password,
     imap = ImaginaServer(host = "imap.migadu.com", port = 993, security = "ssl"),
     smtp = ImaginaServer(host = "smtp.migadu.com", port = 465, security = "ssl"),
+    signature = signature,
 )
 
 internal fun status(
     revoked: Boolean = false,
     changed: Boolean = false,
-) = ImaginaDeviceStatus(revoked = revoked, changed = changed, mailboxes = emptyList())
+    mailboxes: List<ImaginaMailboxStatus> = emptyList(),
+) = ImaginaDeviceStatus(revoked = revoked, changed = changed, mailboxes = mailboxes)
+
+/** A mailbox in the device's status; [signature] `null` is a status that does not mention one. */
+internal fun mailboxStatus(
+    address: String,
+    signature: String? = null,
+    state: String = "current",
+) = ImaginaMailboxStatus(address = address, company = "Casa Pepe", state = state, signature = signature)
 
 internal class InMemoryImaginaDeviceStore : ImaginaDeviceStore {
     override var deviceId: String? = null
@@ -96,8 +106,14 @@ internal class FakeImaginaLocalAccounts : ImaginaLocalAccounts {
 
     /** uuid -> how often the account looks for mail by itself, in minutes. */
     val checkFrequencies = linkedMapOf<String, Int>()
+
+    /** uuid -> the signature the account has been given (plain text), for the accounts that were given one. */
+    val signatures = linkedMapOf<String, String>()
     val removed = mutableListOf<String>()
     var failOnCreate: Set<String> = emptySet()
+
+    /** Accounts whose signature cannot be set. */
+    var failOnSignature: Set<String> = emptySet()
     private var counter = 0
 
     override suspend fun create(mailbox: ImaginaMailAccount, accountName: String, checkFrequencyMinutes: Int): String {
@@ -125,10 +141,17 @@ internal class FakeImaginaLocalAccounts : ImaginaLocalAccounts {
         }
     }
 
+    override fun setSignature(accountUuid: String, signature: String) {
+        if (accountUuid in failOnSignature) throw ImaginaAccountException("cannot save the signature of $accountUuid")
+
+        signatures[accountUuid] = signature
+    }
+
     override fun remove(accountUuid: String) {
         accounts.remove(accountUuid)
         names.remove(accountUuid)
         checkFrequencies.remove(accountUuid)
+        signatures.remove(accountUuid)
         removed += accountUuid
     }
 

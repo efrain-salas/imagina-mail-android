@@ -9,6 +9,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -55,11 +56,24 @@ data class ImaginaDeviceStatus(
     val mailboxes: List<ImaginaMailboxStatus>,
 )
 
-data class ImaginaMailboxStatus(val address: String, val company: String, val state: String)
+/**
+ * A mailbox in the device's status. [signature] is the email signature Imagina gives it (plain text, lines separated by
+ * `\n`, empty for none) and is `null` when Imagina did not say: an older server, or a mailbox that was removed.
+ */
+data class ImaginaMailboxStatus(
+    val address: String,
+    val company: String,
+    val state: String,
+    val signature: String? = null,
+)
 
 data class ImaginaDeviceRefresh(val added: List<ImaginaMailAccount>, val removed: List<String>)
 
-/** A mailbox with the credential Imagina made for this device. */
+/**
+ * A mailbox with the credential Imagina made for this device. [signature] is the email signature Imagina gives it
+ * (plain text, lines separated by `\n`, empty for none); `null` when Imagina did not say, which leaves the account's
+ * signature alone.
+ */
 data class ImaginaMailAccount(
     val address: String,
     val name: String,
@@ -68,6 +82,7 @@ data class ImaginaMailAccount(
     val password: String,
     val imap: ImaginaServer,
     val smtp: ImaginaServer,
+    val signature: String? = null,
 ) {
     /** Never prints the password. */
     override fun toString(): String = "ImaginaMailAccount(address=$address, company=$company)"
@@ -113,6 +128,7 @@ class HttpImaginaDevicesApi(
                         address = mailbox.string("address"),
                         company = mailbox.optionalString("company"),
                         state = mailbox.optionalString("state"),
+                        signature = mailbox.signature(),
                     )
                 },
             )
@@ -241,6 +257,7 @@ private fun JsonObject.toMailAccount() = ImaginaMailAccount(
     password = string("password"),
     imap = getValue("imap").jsonObject.toServer(),
     smtp = getValue("smtp").jsonObject.toServer(),
+    signature = signature(),
 )
 
 private fun JsonObject.toServer() = ImaginaServer(
@@ -252,6 +269,12 @@ private fun JsonObject.toServer() = ImaginaServer(
 private fun JsonObject.string(name: String): String = getValue(name).jsonPrimitive.content
 
 private fun JsonObject.optionalString(name: String): String = this[name]?.jsonPrimitive?.contentOrNull.orEmpty()
+
+/** `null` when the key is absent or not text (an older server): the signature is not touched. */
+private fun JsonObject.signature(): String? {
+    val primitive = this["signature"] as? JsonPrimitive
+    return if (primitive != null && primitive.isString) primitive.content else null
+}
 
 private fun JsonObject.boolean(name: String): Boolean = this[name]?.jsonPrimitive?.booleanOrNull ?: false
 

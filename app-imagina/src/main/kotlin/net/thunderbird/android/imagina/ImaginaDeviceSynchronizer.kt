@@ -37,6 +37,9 @@ sealed interface ImaginaSyncResult {
  *
  * It also tells Imagina the Firebase token of the phone ([push]) and, while Imagina has it, lets the
  * accounts look for mail only once an hour instead of every 15 minutes.
+ *
+ * The email signature of each account is Imagina's: the account gets the one Imagina gives its mailbox when it is
+ * made and on every sync (a mailbox for which Imagina says nothing keeps what it has).
  */
 @Suppress("TooManyFunctions", "LongParameterList")
 class ImaginaDeviceSynchronizer(
@@ -134,6 +137,7 @@ class ImaginaDeviceSynchronizer(
                     applyRefresh(accessToken, deviceId)
                 }
                 renameAccounts()
+                applySignatures(status.mailboxes)
 
                 store.lastSyncAt = clock()
                 store.needsSignIn = false
@@ -238,6 +242,8 @@ class ImaginaDeviceSynchronizer(
         }
         if (!isValid) {
             store.deviceId = null
+        } else if (status != null) {
+            applySignatures(status.mailboxes)
         }
 
         return isValid
@@ -304,6 +310,7 @@ class ImaginaDeviceSynchronizer(
         if (known != null && localAccounts.exists(known.uuid)) {
             localAccounts.updateCredentials(known.uuid, mailbox)
             store.accounts = store.accounts.map { if (it == known) known.copy(company = mailbox.company) else it }
+            applySignature(known.uuid, mailbox.signature)
             return
         }
 
@@ -313,6 +320,29 @@ class ImaginaDeviceSynchronizer(
         val account = ImaginaManagedAccount(address = mailbox.address, uuid = uuid, company = mailbox.company)
         store.accounts = store.accounts.filterNot { it.address.equals(mailbox.address, ignoreCase = true) } + account
         createdAccounts?.add(account)
+        applySignature(uuid, mailbox.signature)
+    }
+
+    /** Gives each account the signature Imagina says its mailbox has; mailboxes without one are left as they are. */
+    private fun applySignatures(mailboxes: List<ImaginaMailboxStatus>) {
+        mailboxes.forEach { mailbox ->
+            val account = store.accounts.firstOrNull { it.address.equals(mailbox.address, ignoreCase = true) }
+            if (account != null && mailbox.state != MAILBOX_REMOVED) {
+                applySignature(account.uuid, mailbox.signature)
+            }
+        }
+    }
+
+    /** A signature that cannot be saved never fails a sync or a sign-in: the next sync tries again. */
+    @Suppress("TooGenericExceptionCaught")
+    private fun applySignature(accountUuid: String, signature: String?) {
+        if (signature == null) return
+
+        try {
+            localAccounts.setSignature(accountUuid, signature)
+        } catch (error: Exception) {
+            logger.warn(TAG, error) { "The signature of an account could not be saved" }
+        }
     }
 
     /**
@@ -429,6 +459,7 @@ class ImaginaDeviceSynchronizer(
     private companion object {
         const val TAG = "ImaginaDeviceSynchronizer"
         const val HTTP_NOT_FOUND = 404
+        const val MAILBOX_REMOVED = "removed"
         val SIGN_IN_REQUIRED_STATUSES = setOf(401, 403, HTTP_NOT_FOUND)
     }
 }
