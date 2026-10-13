@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Whether the special folders of a server (Drafts, Sent, Trash, Spam, Archive) are shown with their name in the
+         language of the app, by their type, instead of the name the server gave them. A white-label app whose
+         servers name them in English (Imagina Mail, with Migadu) turns it on; only the displayed name changes, never
+         the folder on the server -->
+    <bool name="folder_special_names_localized">false</bool>
+</resources>

@@ -377,6 +377,11 @@ dependencies {
 
     testImplementation(libs.appauth)
 
+    // Tests of how the special folders are named (the formatter of Thunderbird's folder names, with a mocked Resources)
+    testImplementation(projects.legacy.ui.folder)
+    testImplementation(projects.feature.mail.folder.api)
+    testImplementation(libs.mockito.kotlin)
+
     // Tests of the link with Imagina's devices API
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(projects.core.logging.testing)

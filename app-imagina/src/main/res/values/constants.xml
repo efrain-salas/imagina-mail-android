@@ -29,6 +29,14 @@
     <!-- No IMAP push from the phone: new mail comes with Imagina's notices (IMAGINA.md, «Notificaciones»), so the
          folder settings do not offer it and the manifest drops the push service, its foreground types and exact alarms -->
     <bool name="folder_push_available">false</bool>
+    <!-- Migadu names the special folders of its mailboxes in English (Archive, Drafts, Junk, Sent, Trash): the app shows
+         them by their type, with the name in the language of the person (special_mailbox_name_* in strings.xml and
+         its translations; IMAGINA.md, «Carpetas especiales»). Only the displayed name changes, not the server's -->
+    <bool name="folder_special_names_localized">true</bool>
+    <!-- Imagina Mail does not declare the CAMERA permission (the manifest removes it): «Take photo» in the attachments
+         of the composition opens the system camera app through an intent, which needs nothing from the app, so the
+         app does not ask for the permission first (IMAGINA.md, «Cambios en ficheros de Thunderbird») -->
+    <bool name="camera_permission_required">false</bool>
     <string-array name="about_extra_libraries" translatable="false">
         <item>Fraunces|https://github.com/undercasetype/Fraunces|SIL Open Font License 1.1</item>
         <item>Instrument Sans|https://github.com/Instrument/instrument-sans|SIL Open Font License 1.1</item>

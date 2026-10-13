@@ -21,6 +21,48 @@
         tools:node="remove"
         />
 
+    <!-- Biometrics (androidx.biometric, which Thunderbird's server settings bring): they only reveal a saved password
+         on the screens that edit a server, and Imagina Mail has none (the account settings open «Entrar con Imagina»
+         instead, IMAGINA.md, «Cómo engancha»), so Google Play need not hear of them -->
+    <uses-permission
+        android:name="android.permission.USE_BIOMETRIC"
+        tools:node="remove"
+        />
+    <uses-permission
+        android:name="android.permission.USE_FINGERPRINT"
+        tools:node="remove"
+        />
+
+    <!-- The camera: the QR scanner of the migration (a screen the «no migration» module leaves without a way in) and
+         «Take photo» in the attachments, which opens the system camera app through an intent and needs no permission
+         of ours (camera_permission_required is false, so the app does not ask for it either). The optional camera
+         feature stays: it only says the camera is not required -->
+    <uses-permission
+        android:name="android.permission.CAMERA"
+        tools:node="remove"
+        />
+
+    <!-- The apps «Import from app» looks for (K-9 Mail and Thunderbird), which Imagina Mail does not offer: its
+         migration is the «no migration» module (IMAGINA.md, «Lo propio de Imagina») -->
+    <queries>
+        <package
+            android:name="com.fsck.k9"
+            tools:node="remove"
+            />
+        <package
+            android:name="net.thunderbird.android"
+            tools:node="remove"
+            />
+        <package
+            android:name="net.thunderbird.android.beta"
+            tools:node="remove"
+            />
+        <package
+            android:name="net.thunderbird.android.daily"
+            tools:node="remove"
+            />
+    </queries>
+
     <application
         android:name=".ThunderbirdApp"
         android:icon="@mipmap/ic_launcher"

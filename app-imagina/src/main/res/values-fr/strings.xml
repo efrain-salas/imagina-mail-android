@@ -16,7 +16,12 @@
     <string name="imagina_error_no_mailboxes">Imagina n’a renvoyé aucune boîte mail pour vous.</string>
     <string name="imagina_error_unknown">Impossible de configurer vos boîtes mail. Veuillez réessayer.</string>
     <string name="imagina_checking_mail">Vérification de vos e-mails…</string>
-    <string name="signature_managed_notice">Votre signature est gérée par Imagina : modifiez-la dans « Mon compte ».</string>
+    <string name="signature_managed_notice">Votre signature est gérée par Imagina : modifiez-la dans « Mon compte ».</string>
     <string name="about_notice">Imagina Mail est une version de Thunderbird pour Android modifiée par Imagina. Ce n’est pas l’application officielle Thunderbird, et ni Mozilla ni MZLA Technologies ne la soutiennent ni ne la recommandent. C’est un logiciel libre sous licence Apache 2.0, dont le code source est disponible ci-dessous.</string>
     <string name="about_privacy_policy">Politique de confidentialité</string>
+    <string name="special_mailbox_name_drafts">Brouillons</string>
+    <string name="special_mailbox_name_sent">Envoyés</string>
+    <string name="special_mailbox_name_trash">Corbeille</string>
+    <string name="special_mailbox_name_spam">Spam</string>
+    <string name="special_mailbox_name_archive">Archives</string>
 </resources>

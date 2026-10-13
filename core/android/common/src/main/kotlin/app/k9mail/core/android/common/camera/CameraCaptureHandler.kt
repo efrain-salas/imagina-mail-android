@@ -11,6 +11,7 @@ import android.provider.MediaStore
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
+import app.k9mail.core.android.common.R
 import app.k9mail.core.android.common.camera.io.CaptureImageFileWriter
 
 class CameraCaptureHandler(
@@ -81,7 +82,13 @@ class CameraCaptureHandler(
         )
     }
 
+    /**
+     * Imagina (IMAGINA.md): an app that does not declare the CAMERA permission ([R.bool.camera_permission_required]
+     * is false) has nothing to ask for, because the system camera app takes the photo.
+     */
     fun hasCameraPermission(context: Context): Boolean {
+        if (!context.resources.getBoolean(R.bool.camera_permission_required)) return true
+
         val hasPermission = ContextCompat.checkSelfPermission(context, permission.CAMERA)
         return hasPermission == PackageManager.PERMISSION_GRANTED
     }

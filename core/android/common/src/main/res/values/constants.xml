@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Whether the app declares the CAMERA permission and asks for it before opening the camera to attach a photo.
+         A white-label app that does not declare it (Imagina Mail: the system camera app takes the photo through an
+         intent and needs nothing from the app) turns it off, and drops the permission from its manifest -->
+    <bool name="camera_permission_required">true</bool>
+</resources>
