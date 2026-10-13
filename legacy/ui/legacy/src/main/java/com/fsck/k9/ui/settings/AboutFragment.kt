@@ -45,6 +45,7 @@ import com.fsck.k9.ui.R
 import com.fsck.k9.ui.settings.AboutContract.Effect
 import com.fsck.k9.ui.settings.AboutContract.Event
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import net.thunderbird.core.common.provider.AppNameProvider
 import net.thunderbird.components.ui.bolt.theme.BoltTheme
 import net.thunderbird.core.ui.contract.mvi.observe
@@ -69,6 +70,7 @@ class AboutFragment : Fragment() {
             val aboutTitle = context.getString(R.string.about_title, appNameProvider.appName)
             val projectTitle = context.getString(R.string.about_project_title)
             val librariesTitle = context.getString(R.string.about_libraries)
+            val extraLibraries = extraLibraries(context)
 
             setContent {
                 val (state, dispatch) = viewModel.observe { effect ->
@@ -88,7 +90,7 @@ class AboutFragment : Fragment() {
                     AboutScreen(
                         versionNumber = state.value.version,
                         appLogoResId = appLogoResId,
-                        libraries = state.value.libraries,
+                        libraries = withExtraLibraries(state.value.libraries, extraLibraries),
                         aboutTitle = aboutTitle,
                         projectTitle = projectTitle,
                         librariesTitle = librariesTitle,
@@ -378,3 +380,18 @@ fun resolveAppLogoResId(context: Context): Int {
         0
     }
 }
+
+/**
+ * The libraries a white-label app adds to the list (`about_extra_libraries`, «name|url|licence»; empty in Thunderbird
+ * and K-9 Mail, whose list stays as it is), in alphabetical order with the rest.
+ */
+private fun extraLibraries(context: Context): List<Library> =
+    context.resources.getStringArray(R.array.about_extra_libraries).mapNotNull { entry ->
+        val parts = entry.split('|', limit = EXTRA_LIBRARY_PARTS)
+        if (parts.size == EXTRA_LIBRARY_PARTS) Library(name = parts[0], url = parts[1], license = parts[2]) else null
+    }
+
+private const val EXTRA_LIBRARY_PARTS = 3
+
+private fun withExtraLibraries(libraries: ImmutableList<Library>, extra: List<Library>): ImmutableList<Library> =
+    if (extra.isEmpty()) libraries else (libraries + extra).sortedBy { it.name.lowercase() }.toImmutableList()

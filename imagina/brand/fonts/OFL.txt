@@ -1,5 +1,6 @@
 Imagina Mail bundles the typefaces of Imagina's design system as the TrueType files of
-app-imagina/src/main/res/font (static instances of the variable fonts, see IMAGINA.md, «Tipografía»):
+app-imagina/src/main/res/font (static instances of the variable fonts, Latin and Latin Extended, see
+IMAGINA.md, «Tipografía»):
 
   Instrument Sans (regular, medium, semibold and bold)
   Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans)

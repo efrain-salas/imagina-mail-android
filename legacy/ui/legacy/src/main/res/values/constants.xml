@@ -20,4 +20,7 @@
     <!-- A note above the signature in the composition defaults: empty here, a white-label app says where its
          signature is managed -->
     <string name="signature_managed_notice" translatable="false"></string>
+    <!-- Libraries a white-label app adds to the list of «About», as «name|url|licence»: empty here; Imagina Mail lists
+         the typefaces it bundles -->
+    <string-array name="about_extra_libraries" translatable="false" />
 </resources>

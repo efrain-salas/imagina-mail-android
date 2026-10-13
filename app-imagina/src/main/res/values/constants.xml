@@ -19,4 +19,10 @@
          changes it in «Mi cuenta», so in the composition defaults it is read only, with a note that says so
          (signature_managed_notice, in strings.xml; IMAGINA.md, «Cambios en ficheros de Thunderbird») -->
     <bool name="signature_editable">false</bool>
+    <!-- The typefaces of Imagina's design system that the app bundles (res/font, imagina/brand/fonts/OFL.txt), in the
+         libraries of «About» (IMAGINA.md, «Tipografía») -->
+    <string-array name="about_extra_libraries" translatable="false">
+        <item>Fraunces|https://github.com/undercasetype/Fraunces|SIL Open Font License 1.1</item>
+        <item>Instrument Sans|https://github.com/Instrument/instrument-sans|SIL Open Font License 1.1</item>
+    </string-array>
 </resources>
