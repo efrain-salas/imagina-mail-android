@@ -91,6 +91,9 @@ internal class FakeImaginaLocalAccounts : ImaginaLocalAccounts {
     val accounts = linkedMapOf<String, ImaginaMailAccount>()
     val createdNames = mutableListOf<String>()
 
+    /** uuid -> the account's name, as the person sees it in the list of accounts. */
+    val names = linkedMapOf<String, String>()
+
     /** uuid -> how often the account looks for mail by itself, in minutes. */
     val checkFrequencies = linkedMapOf<String, Int>()
     val removed = mutableListOf<String>()
@@ -103,6 +106,7 @@ internal class FakeImaginaLocalAccounts : ImaginaLocalAccounts {
         val uuid = "account-${++counter}"
         accounts[uuid] = mailbox
         createdNames += accountName
+        names[uuid] = accountName
         checkFrequencies[uuid] = checkFrequencyMinutes
         return uuid
     }
@@ -115,8 +119,15 @@ internal class FakeImaginaLocalAccounts : ImaginaLocalAccounts {
         accounts[accountUuid] = mailbox
     }
 
+    override fun rename(accountUuid: String, name: String, replacing: Set<String>) {
+        if (names[accountUuid] in replacing) {
+            names[accountUuid] = name
+        }
+    }
+
     override fun remove(accountUuid: String) {
         accounts.remove(accountUuid)
+        names.remove(accountUuid)
         checkFrequencies.remove(accountUuid)
         removed += accountUuid
     }

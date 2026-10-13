@@ -133,6 +133,7 @@ class ImaginaDeviceSynchronizer(
                 if (status.changed) {
                     applyRefresh(accessToken, deviceId)
                 }
+                renameAccounts()
 
                 store.lastSyncAt = clock()
                 store.needsSignIn = false
@@ -260,6 +261,7 @@ class ImaginaDeviceSynchronizer(
             store.accounts
                 .filter { it.address.lowercase() !in listed }
                 .forEach { removeAccount(it) }
+            renameAccounts()
         } catch (error: Throwable) {
             withContext(NonCancellable) {
                 bestEffort { api.disconnectDevice(accessToken, registration.deviceId) }
@@ -305,7 +307,9 @@ class ImaginaDeviceSynchronizer(
             return
         }
 
-        val uuid = localAccounts.create(mailbox, accountName(mailbox, batch), checkFrequencyMinutes())
+        val companies = companiesOf(store.accounts.map { it.company } + batch.map { it.company })
+        val name = accountName(mailbox.address, mailbox.company, companies)
+        val uuid = localAccounts.create(mailbox, name, checkFrequencyMinutes())
         val account = ImaginaManagedAccount(address = mailbox.address, uuid = uuid, company = mailbox.company)
         store.accounts = store.accounts.filterNot { it.address.equals(mailbox.address, ignoreCase = true) } + account
         createdAccounts?.add(account)
@@ -315,15 +319,26 @@ class ImaginaDeviceSynchronizer(
      * The address, and the company too when the person has mailboxes of several companies
      * (`info@casapepe.com · Casa Pepe`).
      */
-    private fun accountName(mailbox: ImaginaMailAccount, batch: List<ImaginaMailAccount>): String {
-        val companies = (store.accounts.map { it.company } + batch.map { it.company })
-            .filter { it.isNotBlank() }
-            .toSet()
+    private fun accountName(address: String, company: String, companies: Set<String>): String =
+        if (companies.size > 1 && company.isNotBlank()) nameWithCompany(address, company) else address
 
-        return if (companies.size > 1 && mailbox.company.isNotBlank()) {
-            "${mailbox.address} · ${mailbox.company}"
-        } else {
-            mailbox.address
+    private fun nameWithCompany(address: String, company: String) = "$address · $company"
+
+    private fun companiesOf(companies: List<String>): Set<String> = companies.filter { it.isNotBlank() }.toSet()
+
+    /**
+     * Gives the accounts already made the name they would get now: the mailboxes of a second company add the company
+     * to the names given before they came, and once one company is left the names go back to the address. A name the
+     * person chose stays.
+     */
+    private fun renameAccounts() {
+        val companies = companiesOf(store.accounts.map { it.company })
+        store.accounts.forEach { account ->
+            localAccounts.rename(
+                accountUuid = account.uuid,
+                name = accountName(account.address, account.company, companies),
+                replacing = setOf(account.address, nameWithCompany(account.address, account.company)),
+            )
         }
     }
 

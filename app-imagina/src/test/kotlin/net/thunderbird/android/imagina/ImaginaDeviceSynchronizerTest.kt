@@ -93,6 +93,56 @@ class ImaginaDeviceSynchronizerTest {
     }
 
     @Test
+    fun `sync adds the company to the names given before the mailbox of a second company came`() = runTest {
+        connected(mailbox("ana@casapepe.com"))
+        api.statusResult = { status(changed = true) }
+        api.refreshResult = {
+            ImaginaDeviceRefresh(added = listOf(mailbox("ana@cafe.es", company = "Café Sol")), removed = emptyList())
+        }
+
+        synchronizer().sync()
+
+        assertThat(localAccounts.names.values.toList())
+            .containsExactly("ana@casapepe.com · Casa Pepe", "ana@cafe.es · Café Sol")
+    }
+
+    @Test
+    fun `sync takes the company off the names when one company is left`() = runTest {
+        connected(mailbox("ana@casapepe.com"), mailbox("ana@cafe.es", company = "Café Sol"))
+        api.statusResult = { status(changed = true) }
+        api.refreshResult = { ImaginaDeviceRefresh(added = emptyList(), removed = listOf("ana@cafe.es")) }
+
+        synchronizer().sync()
+
+        assertThat(localAccounts.names.values.toList()).containsExactly("ana@casapepe.com")
+    }
+
+    @Test
+    fun `sync names the accounts of two companies that were named before the company counted`() = runTest {
+        connected(mailbox("ana@casapepe.com"), mailbox("ana@cafe.es", company = "Café Sol"))
+        localAccounts.names[localAccounts.uuidOf("ana@casapepe.com")] = "ana@casapepe.com"
+
+        synchronizer().sync()
+
+        assertThat(localAccounts.names.values.toList())
+            .containsExactly("ana@casapepe.com · Casa Pepe", "ana@cafe.es · Café Sol")
+    }
+
+    @Test
+    fun `sync keeps a name the person gave the account`() = runTest {
+        connected(mailbox("ana@casapepe.com"))
+        localAccounts.names[localAccounts.uuidOf("ana@casapepe.com")] = "Trabajo"
+        api.statusResult = { status(changed = true) }
+        api.refreshResult = {
+            ImaginaDeviceRefresh(added = listOf(mailbox("ana@cafe.es", company = "Café Sol")), removed = emptyList())
+        }
+
+        synchronizer().sync()
+
+        assertThat(localAccounts.names.values.toList()).containsExactly("Trabajo", "ana@cafe.es · Café Sol")
+    }
+
+    @Test
     fun `connect with a device that is still valid does not register another`() = runTest {
         connected(mailbox("ana@casapepe.com"))
         val firstAccount = localAccounts.uuidOf("ana@casapepe.com")

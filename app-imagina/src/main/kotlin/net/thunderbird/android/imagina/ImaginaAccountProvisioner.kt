@@ -29,6 +29,9 @@ interface ImaginaLocalAccounts {
     /** Puts the servers and credential Imagina gave in the account that already exists. */
     suspend fun updateCredentials(accountUuid: String, mailbox: ImaginaMailAccount)
 
+    /** Gives the account [name] when it has one of the names in [replacing] or none: a name the person chose stays. */
+    fun rename(accountUuid: String, name: String, replacing: Set<String>)
+
     /** Removes the account and its messages in the background. */
     fun remove(accountUuid: String)
 
@@ -102,6 +105,16 @@ class ImaginaAccountProvisioner(
         if (account.updateAutomaticCheckIntervalMinutes(minutes)) {
             preferences.saveAccount(account)
             jobManager.scheduleMailSync(account)
+        }
+    }
+
+    override fun rename(accountUuid: String, name: String, replacing: Set<String>) {
+        val account = preferences.getAccount(accountUuid) ?: return
+        val current = account.name
+
+        if (current != name && (current.isNullOrBlank() || current in replacing)) {
+            account.name = name
+            preferences.saveAccount(account)
         }
     }
 
