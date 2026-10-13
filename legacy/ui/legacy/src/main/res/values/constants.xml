@@ -23,4 +23,7 @@
     <!-- Libraries a white-label app adds to the list of «About», as «name|url|licence»: empty here; Imagina Mail lists
          the typefaces it bundles -->
     <string-array name="about_extra_libraries" translatable="false" />
+    <!-- Whether a folder's settings offer push (the app keeping an IMAP IDLE connection open). A white-label app whose
+         mail arrives through its own notices (Imagina Mail) turns it off and drops the push service from its manifest -->
+    <bool name="folder_push_available">true</bool>
 </resources>

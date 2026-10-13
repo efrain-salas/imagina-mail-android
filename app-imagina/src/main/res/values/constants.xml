@@ -21,6 +21,9 @@
     <bool name="signature_editable">false</bool>
     <!-- The typefaces of Imagina's design system that the app bundles (res/font, imagina/brand/fonts/OFL.txt), in the
          libraries of «About» (IMAGINA.md, «Tipografía») -->
+    <!-- No IMAP push from the phone: new mail comes with Imagina's notices (IMAGINA.md, «Notificaciones»), so the
+         folder settings do not offer it and the manifest drops the push service, its foreground types and exact alarms -->
+    <bool name="folder_push_available">false</bool>
     <string-array name="about_extra_libraries" translatable="false">
         <item>Fraunces|https://github.com/undercasetype/Fraunces|SIL Open Font License 1.1</item>
         <item>Instrument Sans|https://github.com/Instrument/instrument-sans|SIL Open Font License 1.1</item>

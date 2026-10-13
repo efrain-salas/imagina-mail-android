@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+
+    <application>
+
+        <!-- Two exported components of Thunderbird's libraries that a published Imagina Mail has no use for
+             (IMAGINA.md, «Lo propio de Imagina»): -->
+
+        <!-- Jetpack Compose's tool to run a @Preview on a device. It comes with `ui-tooling` in Thunderbird's release
+             too, but anyone could start it from another app and ask it for a composable by name -->
+        <activity
+            android:name="androidx.compose.ui.tooling.PreviewActivity"
+            tools:node="remove"
+            />
+
+        <!-- Hands this app's accounts, passwords included, to K-9 Mail and Thunderbird (the apps on its allowlist) so
+             they can import them. Imagina Mail's accounts are made by Imagina, never moved to another app -->
+        <provider
+            android:name="app.k9mail.feature.migration.provider.SettingsProvider"
+            tools:node="remove"
+            />
+
+    </application>
+</manifest>

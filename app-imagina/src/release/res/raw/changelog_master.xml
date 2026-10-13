@@ -6,7 +6,7 @@
     here with the new versioncode: ImaginaVersionTest fails while the current versionCode has no release.
 -->
 <changelog>
-    <release version="24.0-imagina" versioncode="33" date="2026-10-13">
+    <release version="24.0-imagina" versioncode="3300" date="2026-10-13">
         <change>New: Imagina Mail, a version of Thunderbird for Android 24.0 modified by Imagina (it is not the official app)</change>
         <change>New: Sign in with Imagina, and your mailboxes set themselves up: no server, address or password to type</change>
         <change>New: New mail arrives at once, warned by Imagina, with no permanent notification and no extra permission</change>

@@ -16,6 +16,7 @@
 
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
     <PreferenceCategory android:key="folder_settings">
@@ -38,6 +39,7 @@
         <SwitchPreference
             android:key="folder_settings_push"
             android:title="@string/folder_settings_push_label"
+            app:isPreferenceVisible="@bool/folder_push_available"
             />
 
         <SwitchPreference

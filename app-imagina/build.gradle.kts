@@ -74,6 +74,13 @@ val thunderbirdVersion: ThunderbirdVersion = run {
 // What follows Thunderbird's version in the name Imagina Mail shows: 24.0 becomes 24.0-imagina
 val imaginaVersionSuffix = "-imagina"
 
+// Imagina's builds on one Thunderbird release (IMAGINA_VERSION_REVISION, 0 to 99): Google Play refuses a versionCode it
+// already has, so the code is Thunderbird's times 100 plus this, and a fix of Imagina's between two Thunderbird releases
+// can still go up
+val imaginaVersionRevision: Int = imaginaParameters.getValue("IMAGINA_VERSION_REVISION").toInt().also { revision ->
+    if (revision !in 0..99) throw GradleException("IMAGINA_VERSION_REVISION must be between 0 and 99, not $revision")
+}
+
 android {
     namespace = "net.thunderbird.android"
 
@@ -86,9 +93,10 @@ android {
         applicationId = imaginaParameters.getValue("IMAGINA_APPLICATION_ID")
         testApplicationId = imaginaParameters.getValue("IMAGINA_APPLICATION_ID") + ".tests"
 
-        // The version of Thunderbird this one is made from (IMAGINA.md, «Versión»): its versionCode and its versionName
-        // with Imagina's suffix, taken from where app-thunderbird declares them, so updating Thunderbird updates them
-        versionCode = thunderbirdVersion.code
+        // The version of Thunderbird this one is made from (IMAGINA.md, «Versión»): its versionCode (times 100, plus
+        // Imagina's revision) and its versionName with Imagina's suffix, taken from where app-thunderbird declares them,
+        // so updating Thunderbird updates them
+        versionCode = thunderbirdVersion.code * 100 + imaginaVersionRevision
         versionName = "${thunderbirdVersion.name}$imaginaVersionSuffix"
 
         buildConfigField("String", "CLIENT_INFO_APP_NAME", "\"Imagina Mail\"")
@@ -332,8 +340,11 @@ dependencies {
     // feature is its «no funding» version in every flavor, so the app shows no «Support» entry and no reminder
     implementation(projects.feature.funding.noop)
 
-    implementation(projects.feature.onboarding.migration.thunderbird)
-    implementation(projects.feature.migration.launcher.thunderbird)
+    // No moving in from Thunderbird Desktop or from another mail app (K-9, Thunderbird): the «no migration» version
+    // of both features, as app-k9mail has, so «Import settings» offers neither «Scan QR code» (which names Thunderbird
+    // Desktop) nor «Import from app», and the accounts only come from Imagina (IMAGINA.md, «Lo propio de Imagina»)
+    implementation(projects.feature.onboarding.migration.noop)
+    implementation(projects.feature.migration.launcher.noop)
     implementation(projects.feature.thundermail.api)
     implementation(projects.feature.thundermail.thunderbird)
 

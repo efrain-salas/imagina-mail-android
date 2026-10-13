@@ -10,8 +10,8 @@ import net.thunderbird.android.BuildConfig
 import org.w3c.dom.Element
 
 /**
- * The version of Imagina Mail is the one of the Thunderbird it is made from, with Imagina's suffix (IMAGINA.md,
- * «Versión»), and the changelog that the About screen shows has a release for it.
+ * The version of Imagina Mail is the one of the Thunderbird it is made from, with Imagina's suffix and revision
+ * (IMAGINA.md, «Versión»), and the changelog that the About screen shows has a release for it.
  */
 class ImaginaVersionTest {
     private val thunderbirdBuild = ImaginaProjectFiles.root("app-thunderbird/build.gradle.kts").readText()
@@ -23,10 +23,11 @@ class ImaginaVersionTest {
     ).find(thunderbirdBuild)?.groupValues?.get(1)
 
     @Test
-    fun `the version code is the one of Thunderbird`() {
+    fun `the version code is the one of Thunderbird times 100 plus Imagina's revision`() {
         assertThat(thunderbirdVersionCode).isNotNull()
 
-        assertThat(BuildConfig.VERSION_CODE).isEqualTo(thunderbirdVersionCode!!.toInt())
+        assertThat(BuildConfig.VERSION_CODE)
+            .isEqualTo(thunderbirdVersionCode!!.toInt() * 100 + BuildConfig.IMAGINA_VERSION_REVISION.toInt())
     }
 
     @Test

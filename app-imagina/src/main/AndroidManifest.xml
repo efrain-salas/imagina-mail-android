@@ -5,6 +5,22 @@
     android:installLocation="auto"
     >
 
+    <!-- Thunderbird's IMAP push from the phone (legacy:common), which Imagina Mail does not use: new mail comes with
+         Imagina's notices through Firebase (IMAGINA.md, «Notificaciones»). Without it Google Play asks for no
+         foreground service type nor exact alarms; the folder settings do not offer push (folder_push_available) -->
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+        tools:node="remove"
+        />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"
+        tools:node="remove"
+        />
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        tools:node="remove"
+        />
+
     <application
         android:name=".ThunderbirdApp"
         android:icon="@mipmap/ic_launcher"
@@ -102,6 +118,11 @@
                 android:resource="@xml/unread_widget_info"
                 />
         </receiver>
+
+        <service
+            android:name="com.fsck.k9.controller.push.PushService"
+            tools:node="remove"
+            />
 
     </application>
 </manifest>
