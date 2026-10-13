@@ -7,6 +7,7 @@ import app.k9mail.feature.launcher.FeatureLauncherActivity
 import app.k9mail.feature.launcher.FeatureLauncherTarget
 import com.fsck.k9.Preferences
 import com.fsck.k9.activity.MessageHomeActivity
+import java.lang.ref.WeakReference
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,7 @@ import net.thunderbird.core.android.account.AccountRemovedListener
  * - the sync with Imagina's devices API, now and every few hours (C7.3), which also tells Imagina the
  *   Firebase token of the phone when it does not have it,
  * - the offer to «Entrar con Imagina» again when the last sync lost its sign-in,
+ * - «Entrar con Imagina» in place of an inbox left without accounts (Imagina revoked the phone),
  * - the disconnection of the phone when its last Imagina account is removed.
  */
 class ImaginaStartup(
@@ -34,12 +36,15 @@ class ImaginaStartup(
     private val scope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
     fun start() {
+        val signInWithoutAccounts = SignInWithoutAccounts(preferences)
         preferences.addAccountRemovedListener(
             AccountRemovedListener { accountId ->
                 scope.launch { synchronizer.onAccountRemoved(accountId.toString()) }
+                signInWithoutAccounts.onAccountRemoved()
             },
         )
         application.registerActivityLifecycleCallbacks(ReconnectOffer(store))
+        application.registerActivityLifecycleCallbacks(signInWithoutAccounts)
 
         if (store.isConnected) {
             scheduler.schedule()
@@ -70,6 +75,46 @@ class ImaginaStartup(
         override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) = Unit
         override fun onActivityStarted(activity: Activity) = Unit
         override fun onActivityPaused(activity: Activity) = Unit
+        override fun onActivityStopped(activity: Activity) = Unit
+        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) = Unit
+        override fun onActivityDestroyed(activity: Activity) = Unit
+    }
+
+    /**
+     * The sync removes the accounts of a phone Imagina revoked in the background, so the inbox that is open, or the
+     * one the person comes back to, would stay empty with no way in: «Entrar con Imagina» takes its place, as when
+     * the app starts without accounts (Thunderbird does the same when the last account is removed in its settings).
+     */
+    private class SignInWithoutAccounts(private val preferences: Preferences) : Application.ActivityLifecycleCallbacks {
+        private var resumedInbox: WeakReference<MessageHomeActivity>? = null
+
+        /** Called on the thread that removed the account. */
+        fun onAccountRemoved() {
+            resumedInbox?.get()?.let { inbox -> inbox.runOnUiThread { showSignInWhenNoAccounts(inbox) } }
+        }
+
+        override fun onActivityResumed(activity: Activity) {
+            if (activity is MessageHomeActivity) {
+                resumedInbox = WeakReference(activity)
+                showSignInWhenNoAccounts(activity)
+            }
+        }
+
+        override fun onActivityPaused(activity: Activity) {
+            if (resumedInbox?.get() === activity) {
+                resumedInbox = null
+            }
+        }
+
+        private fun showSignInWhenNoAccounts(inbox: MessageHomeActivity) {
+            if (!inbox.isFinishing && preferences.getAccounts().isEmpty()) {
+                FeatureLauncherActivity.launch(inbox, FeatureLauncherTarget.Onboarding)
+                inbox.finish()
+            }
+        }
+
+        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) = Unit
+        override fun onActivityStarted(activity: Activity) = Unit
         override fun onActivityStopped(activity: Activity) = Unit
         override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) = Unit
         override fun onActivityDestroyed(activity: Activity) = Unit

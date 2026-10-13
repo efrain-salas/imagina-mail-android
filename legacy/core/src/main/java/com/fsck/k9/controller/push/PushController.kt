@@ -254,8 +254,20 @@ class PushController internal constructor(
     private fun getPushAccounts(): Set<LegacyAccountDto> {
         return getPushCapableAccounts()
             .asSequence()
-            .filter { account -> folderRepository.hasPushEnabledFolder(account.id) }
+            .filter { account -> hasPushEnabledFolder(account) }
             .toSet()
+    }
+
+    // Imagina (IMAGINA.md): an account being removed keeps its place in the list of accounts after its database is
+    // closed, and removing its backend runs this check; reading that database threw and closed the app (seen when
+    // Imagina revoked a phone and its two accounts were removed at once). Such an account no longer pushes.
+    private fun hasPushEnabledFolder(account: LegacyAccountDto): Boolean {
+        return try {
+            folderRepository.hasPushEnabledFolder(account.id)
+        } catch (e: IllegalStateException) {
+            Log.w(e, "Could not read the push folders of account %s, which is probably being removed", account)
+            false
+        }
     }
 
     private fun setPushNotificationState(notificationState: PushNotificationState) {
