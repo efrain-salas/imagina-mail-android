@@ -61,4 +61,15 @@ mkdir -p "$BOLT"
 $TOOL $MARK "$BOLT/bolt_thunderbird_logo.xml" --width 72 --height 72
 $TOOL $INVERSE "$BOLT/bolt_k9mail_logo.xml" --width 72 --height 72
 
+# The unread widget (feature/widget/unread) shows K-9 Mail's blue envelope, in three densities, pressed or not: images
+# of the app at the same names replace them with the whole mark (a square of 38 dp, the height of the envelope, so the
+# widget keeps its size), in the five densities; and its preview in the widget picker (144 x 144 at 1.5x)
+for density in mdpi:38 hdpi:57 xhdpi:76 xxhdpi:114 xxxhdpi:152; do
+    mkdir -p "$RES/drawable-${density%%:*}"
+    swift imagina/tools/svg_to_png.swift "$MARK" "$RES/drawable-${density%%:*}/ic_unread_widget.png" "${density##*:}"
+    cp "$RES/drawable-${density%%:*}/ic_unread_widget.png" "$RES/drawable-${density%%:*}/ic_unread_widget_selected.png"
+done
+mkdir -p "$RES/drawable-hdpi"
+swift imagina/tools/svg_to_png.swift "$MARK" "$RES/drawable-hdpi/preview_unread_widget.png" 144
+
 echo "Generated in $RES"
