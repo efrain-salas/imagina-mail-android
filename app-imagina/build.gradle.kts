@@ -93,6 +93,11 @@ android {
         applicationId = imaginaParameters.getValue("IMAGINA_APPLICATION_ID")
         testApplicationId = imaginaParameters.getValue("IMAGINA_APPLICATION_ID") + ".tests"
 
+        // Android 7 or later, one above Thunderbird's sdkMin: Google Play's automatic protection, which guards the app
+        // against repackaged copies, refuses bundles that run on Android 6 (found on the first upload, 14 Oct 2026).
+        // The shared modules keep Thunderbird's minimum.
+        minSdk = 24
+
         // The version of Thunderbird this one is made from (IMAGINA.md, «Versión»): its versionCode (times 100, plus
         // Imagina's revision) and its versionName with Imagina's suffix, taken from where app-thunderbird declares them,
         // so updating Thunderbird updates them
