@@ -12,10 +12,11 @@ MARK=imagina/brand/imagina-mail-mark.svg
 mkdir -p "$OUT"
 
 # Launcher icon: Thunderbird's adaptive icon puts ic_app_logo with a 22 % inset over
-# launcher_icon_background (the brand tile colour, values/imagina_colors.xml). The glyph is
-# re-centred in its 64 x 64 box.
-$TOOL $MARK "$OUT/ic_app_logo.xml" --width 64 --height 64 --translate -3.25 3.25 --skip-rect
-$TOOL $MARK "$OUT/ic_app_logo_monochrome.xml" --width 64 --height 64 --translate -3.25 3.25 --skip-rect --fill '#FFFFFFFF' --drop-fill '#1A1B25'
+# launcher_icon_background (the brand tile colour, values/imagina_colors.xml). The glyph keeps its place in the
+# brand tile: the envelope centred across and a touch low, under the teal dot. Centring the envelope and the dot
+# together pushed the envelope down and to the left, which the round masks of many launchers make obvious.
+$TOOL $MARK "$OUT/ic_app_logo.xml" --width 64 --height 64 --skip-rect
+$TOOL $MARK "$OUT/ic_app_logo_monochrome.xml" --width 64 --height 64 --skip-rect --fill '#FFFFFFFF' --drop-fill '#1A1B25'
 
 # The whole mark, tile included, for the «Entrar con Imagina» screen and the About screen. On dark backgrounds the
 # brand uses its inverse (ivory tile, ink envelope), which Android picks from drawable-night.
